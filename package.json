@@ -1,0 +1,17 @@
+{
+  "name": "multi-threads",
+  "version": "1.1.0",
+  "description": "Threading with JS through NodeJS Cluster",
+  "main": "threaded.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "cluster",
+    "threading",
+    "multi-threading",
+    "threads"
+  ],
+  "author": "Wilson Nguyen",
+  "license": "Apache-2.0"
+}
