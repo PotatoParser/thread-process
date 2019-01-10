@@ -15,8 +15,8 @@
 
 */
 const cluster = require('cluster');
-const EventEmitter = require('events');
-Object.defineProperty(Object.prototype, "override", {
+const EventEmitter = require('events'); 
+/*Object.defineProperty(Object.prototype, "override", {
 	enumerable: false,
 	value: function(secondObject){
 		for (var key in secondObject){
@@ -24,12 +24,18 @@ Object.defineProperty(Object.prototype, "override", {
 		}
 	}
 });
+*/
+const MAX_THREADS = require('os').cpus().length;
+module.exports.MAX_THREADS = MAX_THREADS;
 module.exports = class thread extends EventEmitter{
 	constructor(maxThreads){
-		if (arguments.length == 0){
+		maxThreads = maxThreads || 1;
+		/*if (arguments.length == 0){
 			const maxCPU = require('os').cpus().length;
 			maxThreads = maxCPU;
+			maxThreads = MAX_THREADS;
 		}
+		*/
 		super();
 		this.allThreads = [];
 		this.runningThreads = 0;
@@ -37,7 +43,7 @@ module.exports = class thread extends EventEmitter{
 		for (var i = 0; i < maxThreads;i++){
 			this.allThreads.push(null);
 		}
-		this.hiddenEvents = new EventEmitter();
+		/*this.hiddenEvents = new EventEmitter();
 		this.hiddenEvents.on("store", async(targetThread, processFunc, args)=>{
 			if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
 			var temp = new Promise((resolve)=>{
@@ -47,9 +53,10 @@ module.exports = class thread extends EventEmitter{
 				});
 			});
 			return temp;
-		});
-	}
+		});*/
+	}	
 	add(targetThread, processFunc, args, _type){
+		// Adds in a packaged function (complete with arguments and type);
 		if (!this.allThreads[targetThread]) return;
 		_type = _type || "store";
 		var newFunc = processFunc.toString();
@@ -63,6 +70,7 @@ module.exports = class thread extends EventEmitter{
 		return true;
 	}
 	newThread(settings){
+		// Opens a new thread
 		var targetThread = this.allThreads.indexOf(null);
 		if (targetThread == -1){
 			process.emitWarning("No more threads available");
@@ -80,28 +88,30 @@ module.exports = class thread extends EventEmitter{
 		this.allThreads[targetThread].send({type: "settings", args:settings});
 		return targetThread;
 	}
-	store(processFunc, args, settings){
+	/*store(processFunc, args, settings){
 		settings = settings || undefined;
 		var targetThread = this.newThread(settings);
 		this.add(targetThread, processFunc, args);
-	}
-	async storeAsync(processFunc, args, settings){
+	}*/
+	async store(processFunc, args, settings){
+		// Stores a function and sends a message to the screen when it is done storing.
 		settings = settings || undefined;
 		var targetThread = this.newThread(settings);
-		if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
+		if (!this.add(targetThread, processFunc, args, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.allThreads[targetThread].once("message", (msg)=>{
-				if (msg.status === "stored") resolve();
+				if (msg.status === "stored") resolve(true);
 			});
 		});
 		return temp;
 	}
-	storeReg(processFunc, args, settings) {
+	/*storeReg(processFunc, args, settings) {
+		// Special type of storing?
 		settings = settings || undefined;
-		var targetThread = this.newThread(settings);
+		var targetThread = this.newThread(settings); // Opens a thread with all threads running
 		this.hiddenEvents.emit("store", targetThread, processFunc, args);
 		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
-	}
+	}*/
 	async start(runType){
 		runType = runType || "run";
 		//var totalCount = 0;
@@ -120,6 +130,7 @@ module.exports = class thread extends EventEmitter{
 		return copiedData;
 	}
 	async waitAll(){
+		// Return values for all threads that have completed
 		var _runThreads = this.runningThreads;
 		var final = await new Promise((resolve)=>{
 			var other = 0;
@@ -138,6 +149,7 @@ module.exports = class thread extends EventEmitter{
 		return final;
 	}
 	kill(target){
+		// Kills the target thread or all threads
 		if(arguments.length === 0) {
 			for (var i = 0; i < this.allThreads.length;i++){
 				if (this.allThreads[i] !== null){
@@ -152,10 +164,13 @@ module.exports = class thread extends EventEmitter{
 					this.allThreads[target].send({type:"quit"});
 					this.allThreads[target] = null;
 					this.runningThreads--;
+			} else {
+				// If the thread has not been opened
 			}
 		}
 	}
-	static execute(processFunc, args, settings){
+	static async exec(processFunc, args, settings){
+		// TODO: Change to async
 		var event = new EventEmitter();
 		cluster.setMaxListeners(0);
 		//event.setMaxListeners(Infinity);

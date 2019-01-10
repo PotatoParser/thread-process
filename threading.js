@@ -55,21 +55,25 @@ var _threadObj = {
 		process.exit(0);
 	},
 	instant: (data)=>{
+		// Stores the data and immediately executes it
 		_threadObj.store(data);
 		_threadObj.runOnce(data);
 	},
-	store: (data)=>{
+	/*store: (data)=>{
 		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
-	},
-	storeAsync: (data)=>{
+	},*/
+	store: (data)=>{
 		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
 		process.send({status: "stored"});
 	},
 	run: (data)=>{
 		var startTime = new Date();
 		var targetProcess = processFunc[processFunc.length-1];
-		if (_threadObj.target !== null) {targetProcess = processFunc[_threadObj.target];}
+		if (_threadObj.target !== null) {
+			targetProcess = processFunc[_threadObj.target];
+		}
 		var temp = targetProcess.func.apply(null, targetProcess.args);
+		// Sends the values when done
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});
 	},
 	runOnce: (data)=>{
