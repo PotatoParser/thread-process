@@ -92,10 +92,8 @@ var _threadObj = {
 	run: async (data)=>{
 		var startTime = new Date();
 		console.log(THREAD_DATA, FOCUSED_FUNCTION);
-		console.log(data);
 		var temp = await THREAD_DATA[data.targetFunction || FOCUSED_FUNCTION].apply(null, data.args);
 		// Sends the values when done
-		console.log(data);
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
 		/*var startTime = new Date();
 		var targetProcess = processFunc[processFunc.length-1];
@@ -123,6 +121,7 @@ var _threadObj = {
 
 var _$queue = [];
 function readData(data){
+	// Read data based on a queue
 	if (!_threadObj.working) _threadObj.working = true;
 	else return;
 	if (typeof _threadObj[data.type] == 'function'){

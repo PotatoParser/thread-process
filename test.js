@@ -71,6 +71,9 @@ var randomizer = async ()=>{
 	};
 	return totalString;
 }
+var control = ()=>{
+	console.log("YEETUS");
+};
 async function main(){
 	var temp = new thread();
 	console.log(temp);
@@ -78,6 +81,7 @@ async function main(){
 		console.log(data);
 	});*/
 	await temp.store(randomizer);
+	await temp.store(control);	
 	temp.on("complete", (data)=>{console.log(data)});
 	temp.run([1]);
 	//console.log(await temp.start());

@@ -28,8 +28,12 @@ const EventEmitter = require('events');
 const MAX_THREADS = require('os').cpus().length;
 module.exports.MAX_THREADS = MAX_THREADS; // Obsolete
 module.exports = class thread extends EventEmitter{
-	constructor(maxThreads){
+	constructor(maxThreads, settings){
 		maxThreads = maxThreads || 1;
+		if (typeof maxThreads !== 'number') {
+			settings = maxThreads;
+			maxThreads = 1;
+		}
 		/*if (arguments.length == 0){
 			const maxCPU = require('os').cpus().length;
 			maxThreads = maxCPU;
@@ -37,9 +41,10 @@ module.exports = class thread extends EventEmitter{
 		}
 		*/
 		super();
+		this.threadSettings = settings;		
 		this.allThreads = [];
 		this.runningThreads = 0;
-		this.threadData = [];
+		//this.threadData = [];
 		for (var i = 0; i < maxThreads;i++){
 			this.allThreads.push(null);
 		}
@@ -86,6 +91,9 @@ module.exports = class thread extends EventEmitter{
 		settings = settings || {};
 		settings._id = targetThread;
 		this.allThreads[targetThread].send({type: "settings", args:settings});
+		this.allThreads[targetThread].on("error", (msg)=>{
+			this.emit("error", msg);
+		});
 		return targetThread;
 	}
 	/*store(processFunc, args, settings){
@@ -93,10 +101,20 @@ module.exports = class thread extends EventEmitter{
 		var targetThread = this.newThread(settings);
 		this.add(targetThread, processFunc, args);
 	}*/
-	async store(processFunc, settings){
+	async store(targetThread, processFunc){
 		// Stores a function and sends a message to the screen when it is done storing.
-		settings = settings || undefined;
-		var targetThread = this.newThread(settings);
+		if (arguments.length === 1) {
+			processFunc = targetThread;
+			targetThread = false;
+		}
+		if (typeof targetThread === 'number') {
+			targetThread = targetThread || this.newThread(this.threadSettings);
+		} else {
+			if (this.allThreads[0] === null) targetThread = this.newThread(this.threadSettings);
+			else targetThread = 0;
+		}
+		console.log("THREAD" + targetThread);
+		//targetThread = (typeof targetThread === 'number') ? targetThread || this.newThread(this.threadSettings) : 0;
 		if (!this.add(targetThread, processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.allThreads[targetThread].once("message", (msg)=>{
@@ -131,8 +149,9 @@ module.exports = class thread extends EventEmitter{
 			//totalCount++;
 		}
 		var final = await this.waitAll();
-		this.threadData.push({duration: (new Date()).getTime() - startTime.getTime()});
-		var copiedData = this.threadData;
+		var allData = [];
+		allData.push({duration: (new Date()).getTime() - startTime.getTime()});
+		var copiedData = allData;
 		this.emit("complete", copiedData);
 		if (runType == "runOnce") this.kill();
 		return copiedData;
@@ -157,17 +176,18 @@ module.exports = class thread extends EventEmitter{
 	async waitAll(){
 		// Return values for all threads that have completed
 		var _runThreads = this.runningThreads;
+		var allData = [];
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			cluster.on("message", (worker, msg)=>{
 				if(msg.status === "done"){
-					this.threadData.push(msg.value);
+					allData.push(msg.value);
 					this.emit("end", msg.value);
 					other++;
 				}
 				if (other === _runThreads){
 					for (var i = 0; i < this.allThreads.length; i++) this.allThreads[i] = null;
-					resolve();
+					resolve(allData);
 				}
 			});
 		});
