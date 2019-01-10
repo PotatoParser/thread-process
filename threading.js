@@ -27,11 +27,31 @@ Object.defineProperty(Object.prototype, "overlap", {
 	}
 });
 
+// Converts the function text into an actual function
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
 function analyzeFunction(stringFunc){
+	stringFunc = stringFunc.trim();
+	var asynchronous = false;
+	if (stringFunc.indexOf("async") === 0) {
+		stringFunc = stringFunc.substring(5).trim();
+		asynchronous = true;
+	}
 	var other = new RegExp(" ", 'g');
 	var firstPart = stringFunc.indexOf(")");
+	var firstCurl = stringFunc.indexOf("{");
+	var arrow = stringFunc.indexOf("=>");
+	if (arrow !== -1 && arrow > firstPart && arrow < firstCurl) {
+		stringFunc = stringFunc.substring(0, firstPart+1) + stringFunc.substring(arrow+2);
+	}
+	firstPart = stringFunc.indexOf(")");
 	var necessaryArray = ((stringFunc.substring(stringFunc.indexOf("(")+1, firstPart).replace(other, "")).split(","));
-	var finalFunction = new Function(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
+	var finalFunction;	
+	if (asynchronous) {
+		finalFunction = new AsyncFunction(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
+	} else {
+		finalFunction = new Function(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
+	}
+	console.log(finalFunction.toString());
 	return finalFunction;
 }
 var processFunc = [];

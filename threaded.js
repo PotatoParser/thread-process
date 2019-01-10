@@ -93,11 +93,11 @@ module.exports = class thread extends EventEmitter{
 		var targetThread = this.newThread(settings);
 		this.add(targetThread, processFunc, args);
 	}*/
-	async store(processFunc, args, settings){
+	async store(processFunc, settings){
 		// Stores a function and sends a message to the screen when it is done storing.
 		settings = settings || undefined;
 		var targetThread = this.newThread(settings);
-		if (!this.add(targetThread, processFunc, args, "store")) return false;
+		if (!this.add(targetThread, processFunc, {}, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.allThreads[targetThread].once("message", (msg)=>{
 				if (msg.status === "stored") resolve(true);

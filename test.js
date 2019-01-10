@@ -63,8 +63,7 @@ console.log(other(1));
 */
 
 const thread = require('./threaded');
-
-async function randomizer(){
+var randomizer = async ()=>{
 	var num = Math.round(Math.random() * 100 + 0);
 	var totalString = "";
 	for (var i = 0; i < num; i++){
@@ -79,6 +78,9 @@ async function main(){
 		console.log(data);
 	});*/
 	await temp.store(randomizer, []);
+	temp.on("complete", (data)=>{console.log(data)});
+	temp.start();
+	//console.log(await temp.start());
 	/*for (var i = 0; i < 8; i++) {
 		console.log("Thread: " + i);
 		//thread.execute(randomizer, []);
