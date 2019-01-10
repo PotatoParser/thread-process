@@ -77,8 +77,8 @@ async function main(){
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
-	await temp.store(randomizer, []);
-	temp.on("complete", (data)=>{console.log(data)});
+	await temp.store(randomizer);
+	//temp.on("complete", (data)=>{console.log(data)});
 	temp.start();
 	//console.log(await temp.start());
 	/*for (var i = 0; i < 8; i++) {

@@ -51,10 +51,11 @@ function analyzeFunction(stringFunc){
 	} else {
 		finalFunction = new Function(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
 	}
-	console.log(finalFunction.toString());
 	return finalFunction;
 }
-var processFunc = [];
+var THREAD_DATA = {};
+var FOCUSED_FUNCTION = "";
+//var processFunc = [];
 var _$setting = {
 	_id: null,
 	_target: null,
@@ -83,18 +84,26 @@ var _threadObj = {
 		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
 	},*/
 	store: (data)=>{
-		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
+		THREAD_DATA[data.args.name] = analyzeFunction(data.processFunc);
+		FOCUSED_FUNCTION = data.args.name;
+		//processFunc.push({func: analyzeFunction(data.processFunc, data.args), args: data.args});
 		process.send({status: "stored"});
 	},
 	run: (data)=>{
 		var startTime = new Date();
+		console.log(THREAD_DATA, FOCUSED_FUNCTION);
+		var temp = THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
+		// Sends the values when done
+		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
+		/*var startTime = new Date();
 		var targetProcess = processFunc[processFunc.length-1];
 		if (_threadObj.target !== null) {
 			targetProcess = processFunc[_threadObj.target];
 		}
 		var temp = targetProcess.func.apply(null, targetProcess.args);
 		// Sends the values when done
-		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});
+		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});*/
+
 	},
 	runOnce: (data)=>{
 		_threadObj.run(data);

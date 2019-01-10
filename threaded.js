@@ -26,7 +26,7 @@ const EventEmitter = require('events');
 });
 */
 const MAX_THREADS = require('os').cpus().length;
-module.exports.MAX_THREADS = MAX_THREADS;
+module.exports.MAX_THREADS = MAX_THREADS; // Obsolete
 module.exports = class thread extends EventEmitter{
 	constructor(maxThreads){
 		maxThreads = maxThreads || 1;
@@ -97,7 +97,7 @@ module.exports = class thread extends EventEmitter{
 		// Stores a function and sends a message to the screen when it is done storing.
 		settings = settings || undefined;
 		var targetThread = this.newThread(settings);
-		if (!this.add(targetThread, processFunc, {}, "store")) return false;
+		if (!this.add(targetThread, processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.allThreads[targetThread].once("message", (msg)=>{
 				if (msg.status === "stored") resolve(true);
@@ -112,13 +112,13 @@ module.exports = class thread extends EventEmitter{
 		this.hiddenEvents.emit("store", targetThread, processFunc, args);
 		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
 	}*/
-	async start(runType){
+	async start(runType, args){
 		runType = runType || "run";
 		//var totalCount = 0;
 		var startTime = new Date();
 		for (var i = 0; i < this.allThreads.length; i++){
 			if (this.allThreads[i] === null) continue;
-			this.allThreads[i].send({type: runType});
+			this.allThreads[i].send({type: runType, args: args});
 			this.runningThreads++;
 			//totalCount++;
 		}
