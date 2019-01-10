@@ -89,11 +89,13 @@ var _threadObj = {
 		//processFunc.push({func: analyzeFunction(data.processFunc, data.args), args: data.args});
 		process.send({status: "stored"});
 	},
-	run: (data)=>{
+	run: async (data)=>{
 		var startTime = new Date();
 		console.log(THREAD_DATA, FOCUSED_FUNCTION);
-		var temp = THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
+		console.log(data);
+		var temp = await THREAD_DATA[data.targetFunction || FOCUSED_FUNCTION].apply(null, data.args);
 		// Sends the values when done
+		console.log(data);
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
 		/*var startTime = new Date();
 		var targetProcess = processFunc[processFunc.length-1];

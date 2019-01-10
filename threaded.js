@@ -103,6 +103,7 @@ module.exports = class thread extends EventEmitter{
 				if (msg.status === "stored") resolve(true);
 			});
 		});
+		console.log("STORED");
 		return temp;
 	}
 	/*storeReg(processFunc, args, settings) {
@@ -112,7 +113,31 @@ module.exports = class thread extends EventEmitter{
 		this.hiddenEvents.emit("store", targetThread, processFunc, args);
 		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
 	}*/
-	async start(runType, args){
+	async run(functionName, args){
+		var runType = "run";
+		console.log("RUNNING");
+		if (arguments.length === 1) {
+			if (typeof functionName === 'object') {
+				args = functionName;
+				functionName = null;
+			}
+		}
+		//var totalCount = 0;
+		var startTime = new Date();
+		for (var i = 0; i < this.allThreads.length; i++){
+			if (this.allThreads[i] === null) continue;
+			this.allThreads[i].send({type: runType, targetFunction: functionName, args: args});
+			this.runningThreads++;
+			//totalCount++;
+		}
+		var final = await this.waitAll();
+		this.threadData.push({duration: (new Date()).getTime() - startTime.getTime()});
+		var copiedData = this.threadData;
+		this.emit("complete", copiedData);
+		if (runType == "runOnce") this.kill();
+		return copiedData;
+	}	
+	/*async start(runType, args){
 		runType = runType || "run";
 		//var totalCount = 0;
 		var startTime = new Date();
@@ -128,7 +153,7 @@ module.exports = class thread extends EventEmitter{
 		this.emit("complete", copiedData);
 		if (runType == "runOnce") this.kill();
 		return copiedData;
-	}
+	}*/
 	async waitAll(){
 		// Return values for all threads that have completed
 		var _runThreads = this.runningThreads;
@@ -191,7 +216,7 @@ module.exports = class thread extends EventEmitter{
 			event.emit("end", msg.value);
 		});
 	}
-	run(targetThread, runType){
+	/*run(targetThread, runType){
 		if (arguments.length === 1 && typeof targetThread === 'string')
 			runType = targetThread;
 		else runType = runType || "run";
@@ -206,5 +231,5 @@ module.exports = class thread extends EventEmitter{
 			this.allThreads[targetThread].send({type:runType});
 			this.runningThreads++;
 		}
-	}
+	}*/
 }

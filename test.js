@@ -78,8 +78,8 @@ async function main(){
 		console.log(data);
 	});*/
 	await temp.store(randomizer);
-	//temp.on("complete", (data)=>{console.log(data)});
-	temp.start();
+	temp.on("complete", (data)=>{console.log(data)});
+	temp.run([1]);
 	//console.log(await temp.start());
 	/*for (var i = 0; i < 8; i++) {
 		console.log("Thread: " + i);
