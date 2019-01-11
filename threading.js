@@ -128,11 +128,38 @@ var _threadObj = {
 }
 
 
-var _$queue = [];
+/*var _$queue = [];
 function readData(data){
 	// Read data based on a queue
 	if (!_threadObj.working) _threadObj.working = true;
 	else return;
+	console.log(data.type);
+	if (typeof _threadObj[data.type] == 'function'){
+		_threadObj[data.type](data);
+		_$setting._timeout();
+		_$queue.splice(0,1);
+		WARN(data.type);		
+		if (_$queue.length > 0){
+			readData(_$queue[_$queue.length-1]);
+		} else {
+			_threadObj.working = false;
+		}
+	}
+}*/
+
+if (cluster.isWorker){
+	process.on('message', function(data){
+		console.log(data);
+	if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
+	WARN("LOL");
+	});
+}
+/*var _$queue = [];
+function readData(data){
+	// Read data based on a queue
+	if (!_threadObj.working) _threadObj.working = true;
+	else return;
+	console.log(data.type);
 	if (typeof _threadObj[data.type] == 'function'){
 		_threadObj[data.type](data);
 		_$setting._timeout();
@@ -153,6 +180,5 @@ if (cluster.isWorker){
 	process.on('message', function(data){
 		_$queue.push(data);
 		readData(data);	
-		console.log(data);	
 	});
-}
+}*/

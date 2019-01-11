@@ -89,12 +89,15 @@ module.exports = class thread extends EventEmitter{
 		settings = settings || {};
 		settings._id = targetThread;
 		this.allThreads[targetThread].send({type: "settings", args:settings});
+		this.allThreads[targetThread].setMaxListeners(0);
 		this.allThreads[targetThread].on("message", (msg)=>{
+			console.log(msg);
 			if (msg.status == "warning") {
-				process.emitWarning(`[Thread: ${targetThread}] - ${msg.error}`);			
-				this.emit("warning", {thread: targetThread, msg: msg.error});
+				//process.emitWarning(`[Thread: ${targetThread}] - ${msg.error}`);			
+				//this.emit("warning", {thread: targetThread, msg: msg.error});
 			}
 		});
+		module.exports.OPEN_THREADS++;
 		return targetThread;
 	}
 	/*store(processFunc, args, settings){
@@ -210,6 +213,7 @@ module.exports = class thread extends EventEmitter{
 						this.allThreads[i].send({type:"quit"});
 						this.allThreads[i] = null;
 						this.runningThreads--;
+						module.exports.OPEN_THREADS--;
 					}
 				}
 				this.threadData = [];
@@ -290,3 +294,4 @@ module.exports = class thread extends EventEmitter{
 	}*/
 }
 module.exports.MAX_THREADS = MAX_THREADS;
+module.exports.OPEN_THREADS = 0;
