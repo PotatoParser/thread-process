@@ -59,6 +59,8 @@ global.require = (mdl)=>{
 global.THREAD_DATA = {};
 var FOCUSED_FUNCTION = "";
 //var processFunc = [];
+
+// Currently obsolete
 var _$setting = {
 	_id: null,
 	_target: null,
@@ -81,10 +83,6 @@ var _threadObj = {
 	quit: (data)=>{
 		process.exit(0);
 	},
-	instant: (data)=>{
-		_threadObj.store(data);
-		_threadObj.runOnce(data);
-	},
 	store: (data)=>{
 		THREAD_DATA[data.args.name] = analyzeFunction(data.processFunc);
 		FOCUSED_FUNCTION = data.args.name;
@@ -95,20 +93,13 @@ var _threadObj = {
 		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;		
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
-
-	},
-	runOnce: (data)=>{
-		_threadObj.run(data);
-		_threadObj.quit();
 	},
 	newTarget: (data)=>{
 		FOCUSED_FUNCTION = data.target;
-		//_threadObj.target = data.target;
 	},
 	settings: (data)=>{
 		_$setting.overlap(data.args);
-	},
-	target: null,
+	}
 }
 
 if (cluster.isWorker){
