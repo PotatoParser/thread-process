@@ -80,10 +80,11 @@ async function main(){
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
-	await temp.store(randomizer);
-	await temp.store(control);	
-	temp.on("complete", (data)=>{console.log(data)});
-	temp.run([1]);
+	//await temp.store(randomizer);
+	//await temp.store(control);	
+	//temp.on("complete", (data)=>{console.log(data)});
+	//temp.runOnce("randomizer");
+	thread.exec(randomizer, []);
 	//console.log(await temp.start());
 	/*for (var i = 0; i < 8; i++) {
 		console.log("Thread: " + i);

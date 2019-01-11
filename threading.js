@@ -73,6 +73,7 @@ var _$setting = {
 };
 var _threadObj = {
 	quit: (data)=>{
+		console.log("QUITTING THREAD");
 		process.exit(0);
 	},
 	instant: (data)=>{
@@ -84,15 +85,18 @@ var _threadObj = {
 		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
 	},*/
 	store: (data)=>{
+		console.log(data);
 		THREAD_DATA[data.args.name] = analyzeFunction(data.processFunc);
 		FOCUSED_FUNCTION = data.args.name;
 		//processFunc.push({func: analyzeFunction(data.processFunc, data.args), args: data.args});
 		process.send({status: "stored"});
 	},
 	run: async (data)=>{
+		console.log(THREAD_DATA);
 		var startTime = new Date();
-		console.log(THREAD_DATA, FOCUSED_FUNCTION);
-		var temp = await THREAD_DATA[data.targetFunction || FOCUSED_FUNCTION].apply(null, data.args);
+		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;
+		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
+		console.log(temp);
 		// Sends the values when done
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
 		/*var startTime = new Date();
@@ -110,7 +114,8 @@ var _threadObj = {
 		_threadObj.quit();
 	},
 	newTarget: (data)=>{
-		_threadObj.target = data.target;
+		FOCUSED_FUNCTION = data.target;
+		//_threadObj.target = data.target;
 	},
 	settings: (data)=>{
 		_$setting.overlap(data.args);

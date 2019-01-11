@@ -132,7 +132,6 @@ module.exports = class thread extends EventEmitter{
 		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
 	}*/
 	async run(functionName, args){
-		var runType = "run";
 		console.log("RUNNING");
 		if (arguments.length === 1) {
 			if (typeof functionName === 'object') {
@@ -141,21 +140,27 @@ module.exports = class thread extends EventEmitter{
 			}
 		}
 		//var totalCount = 0;
-		var startTime = new Date();
+		//var startTime = new Date();
 		for (var i = 0; i < this.allThreads.length; i++){
 			if (this.allThreads[i] === null) continue;
-			this.allThreads[i].send({type: runType, targetFunction: functionName, args: args});
+			this.allThreads[i].send({type: "run", targetFunction: functionName, args: args});
 			this.runningThreads++;
 			//totalCount++;
 		}
-		var final = await this.waitAll();
-		var allData = [];
-		allData.push({duration: (new Date()).getTime() - startTime.getTime()});
-		var copiedData = allData;
-		this.emit("complete", copiedData);
-		if (runType == "runOnce") this.kill();
-		return copiedData;
+		//var allData = [];		
+		var returnedData = await this.waitAll();
+		//allData.push(final);
+		//allData.push({duration: (new Date()).getTime() - startTime.getTime()});
+		//var copiedData = allData;
+		this.emit("complete", returnedData);
+		//if (runType == "runOnce") this.close();
+		return returnedData;
 	}	
+	async runOnce(functionName, args){
+		var temp = await this.run(functionName, args);
+		this.close();
+		return temp;
+	}		
 	/*async start(runType, args){
 		runType = runType || "run";
 		//var totalCount = 0;
@@ -186,14 +191,36 @@ module.exports = class thread extends EventEmitter{
 					other++;
 				}
 				if (other === _runThreads){
-					for (var i = 0; i < this.allThreads.length; i++) this.allThreads[i] = null;
+					//for (var i = 0; i < this.allThreads.length; i++) this.allThreads[i] = null;
 					resolve(allData);
 				}
 			});
 		});
+		if (this.runningThreads === 1) return final[0];
 		return final;
 	}
-	kill(target){
+	close(target){
+			// Kills the target thread or all threads
+			if(arguments.length === 0) {
+				for (var i = 0; i < this.allThreads.length;i++){
+					if (this.allThreads[i] !== null){
+						this.allThreads[i].send({type:"quit"});
+						this.allThreads[i] = null;
+						this.runningThreads--;
+					}
+				}
+				this.threadData = [];
+			} else {
+				if (this.allThreads[target] !== null){
+						this.allThreads[target].send({type:"quit"});
+						this.allThreads[target] = null;
+						this.runningThreads--;
+				} else {
+					// If the thread has not been opened
+				}
+			}
+		}	
+	/*kill(target){
 		// Kills the target thread or all threads
 		if(arguments.length === 0) {
 			for (var i = 0; i < this.allThreads.length;i++){
@@ -213,16 +240,20 @@ module.exports = class thread extends EventEmitter{
 				// If the thread has not been opened
 			}
 		}
-	}
+	}*/
 	static async exec(processFunc, args, settings){
+		var temp = new thread(settings);
+		await temp.store(processFunc);
+		await temp.runOnce(processFunc.name, args);
 		// TODO: Change to async
-		var event = new EventEmitter();
+		/*var event = new EventEmitter();
 		cluster.setMaxListeners(0);
 		//event.setMaxListeners(Infinity);
 		var newFunc = processFunc.toString();
 		var _package = {
 			type: "instant",
 			processFunc: newFunc,
+			functionName: newFunc.name,
 			args: args
 		}
 		if(!cluster.isMaster) return;
@@ -233,8 +264,10 @@ module.exports = class thread extends EventEmitter{
 		var worker = cluster.fork();
 		worker.send(_package);
 		cluster.on("message", (worker, msg)=>{
+			console.log(msg.value);
 			event.emit("end", msg.value);
 		});
+		*/
 	}
 	/*run(targetThread, runType){
 		if (arguments.length === 1 && typeof targetThread === 'string')
