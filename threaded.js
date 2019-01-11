@@ -88,7 +88,7 @@ module.exports = class thread extends EventEmitter{
 		return returnedData;
 	}	
 	async runOnce(functionName, args){
-		var temp = await this.run(functionName, args);
+		var temp = (!args) ? await this.run(functionName) : await this.run(functionName, args);
 		this.close();
 		return temp;
 	}		

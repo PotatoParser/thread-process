@@ -149,7 +149,6 @@ function readData(data){
 
 if (cluster.isWorker){
 	process.on('message', function(data){
-		console.log(data);
 	if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
 	WARN("LOL");
 	});

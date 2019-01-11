@@ -72,7 +72,7 @@ var randomizer = async ()=>{
 	return totalString;
 }
 var control = (num)=>{
-	console.log(THREAD_DATA);
+	//console.log(global.THREAD_DATA);
 	console.log("The magic number is: " + num);
 };
 async function main(){
@@ -81,13 +81,13 @@ async function main(){
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
-	await temp.store(randomizer);
+	await temp.store(control);
 	//await temp.store(control);	
 	//temp.on("complete", (data)=>{console.log(data)});
-	console.log(await temp.run());
-	console.log(await temp.run());
-	console.log(await temp.run());
-	console.log(await temp.runOnce());
+	console.log(await temp.run([1]));
+	console.log(await temp.run([2]));
+	console.log(await temp.run([3]));
+	console.log(await temp.runOnce([4]));
 
 	//var temp2 = await thread.exec(control, [10]);
 	//console.log(temp2);
