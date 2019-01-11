@@ -20,13 +20,12 @@ const MAX_THREADS = require('os').cpus().length;
 module.exports = class thread extends EventEmitter{
 	constructor(settings){
 		super();
-		this.threadSettings = settings;	
+		this.threadSettings = settings || {};	
 		this.active = false;
 		this.worker;	
 	}	
-	add(targetThread, processFunc, args, _type){
+	add(processFunc, args, _type){
 		// Adds in a packaged function (complete with arguments and type);
-		if (!this.allThreads[targetThread]) return;
 		_type = _type || "store";
 		var newFunc = processFunc.toString();
 		var _package = {
@@ -35,7 +34,7 @@ module.exports = class thread extends EventEmitter{
 			args: args
 		}
 		if(!cluster.isMaster) return;
-		this.allThreads[targetThread].send(_package);
+		this.worker.send(_package);
 		return true;
 	}
 	open(){
@@ -51,7 +50,7 @@ module.exports = class thread extends EventEmitter{
 			silent: false
 		});
 		this.worker = cluster.fork();
-		this.threadSettings._id = targetThread;
+		this.threadSettings["_id"] = 0;
 		this.worker.send({type: "settings", args:this.threadSettings});
 		this.worker.setMaxListeners(0);
 		this.worker.on("message", (msg)=>{
@@ -62,7 +61,7 @@ module.exports = class thread extends EventEmitter{
 			}
 		});
 		module.exports.OPEN_THREADS++;
-		return targetThread;
+		return 0;
 	}
 	/*store(processFunc, args, settings){
 		settings = settings || undefined;
@@ -81,25 +80,18 @@ module.exports = class thread extends EventEmitter{
 			if (this.allThreads[0] === null) targetThread = this.newThread(this.threadSettings);
 			else targetThread = 0;
 		}*/
-		targetThread = this.open();
+		this.open();
 		//console.log("THREAD" + targetThread);
 		//targetThread = (typeof targetThread === 'number') ? targetThread || this.newThread(this.threadSettings) : 0;
-		if (!this.add(targetThread, processFunc, {name: processFunc.name}, "store")) return false;
+		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
-			this.allThreads[targetThread].once("message", (msg)=>{
+			this.worker.once("message", (msg)=>{
 				if (msg.status === "stored") resolve(true);
 			});
 		});
 		//console.log("STORED");
 		return temp;
 	}
-	/*storeReg(processFunc, args, settings) {
-		// Special type of storing?
-		settings = settings || undefined;
-		var targetThread = this.newThread(settings); // Opens a thread with all threads running
-		this.hiddenEvents.emit("store", targetThread, processFunc, args);
-		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
-	}*/
 	async run(functionName, args){
 		//console.log("RUNNING");
 		if (arguments.length === 1) {
@@ -159,26 +151,6 @@ module.exports = class thread extends EventEmitter{
 		this.worker.send({type:"quit"});
 		this.worker = null;
 		module.exports.OPEN_THREADS--;		
-			// Kills the target thread or all threads
-			/*if(arguments.length === 0) {
-				for (var i = 0; i < this.allThreads.length;i++){
-					if (this.allThreads[i] !== null){
-						this.allThreads[i].send({type:"quit"});
-						this.allThreads[i] = null;
-						this.runningThreads--;
-						module.exports.OPEN_THREADS--;
-					}
-				}
-				this.threadData = [];
-			} else {
-				if (this.allThreads[target] !== null){
-						this.allThreads[target].send({type:"quit"});
-						this.allThreads[target] = null;
-						this.runningThreads--;
-				} else {
-					// If the thread has not been opened
-				}
-			}*/
 		}	
 	static async exec(processFunc, args, settings){
 		var temp = new thread(settings);
