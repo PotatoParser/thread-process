@@ -79,42 +79,22 @@ function WARN(msg){
 }
 var _threadObj = {
 	quit: (data)=>{
-		//console.log("QUITTING THREAD");
-		//WARN("lol");
 		process.exit(0);
 	},
 	instant: (data)=>{
-		// Stores the data and immediately executes it
 		_threadObj.store(data);
 		_threadObj.runOnce(data);
 	},
-	/*store: (data)=>{
-		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
-	},*/
 	store: (data)=>{
-		//console.log(data);
 		THREAD_DATA[data.args.name] = analyzeFunction(data.processFunc);
 		FOCUSED_FUNCTION = data.args.name;
-		//processFunc.push({func: analyzeFunction(data.processFunc, data.args), args: data.args});
 		process.send({status: "stored"});
 	},
 	run: async (data)=>{
-		//console.log(THREAD_DATA);
 		var startTime = new Date();
 		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;		
-		//var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(global, data.args);
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
-		//console.log(temp);
-		// Sends the values when done
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
-		/*var startTime = new Date();
-		var targetProcess = processFunc[processFunc.length-1];
-		if (_threadObj.target !== null) {
-			targetProcess = processFunc[_threadObj.target];
-		}
-		var temp = targetProcess.func.apply(null, targetProcess.args);
-		// Sends the values when done
-		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});*/
 
 	},
 	runOnce: (data)=>{
@@ -131,57 +111,9 @@ var _threadObj = {
 	target: null,
 }
 
-
-/*var _$queue = [];
-function readData(data){
-	// Read data based on a queue
-	if (!_threadObj.working) _threadObj.working = true;
-	else return;
-	console.log(data.type);
-	if (typeof _threadObj[data.type] == 'function'){
-		_threadObj[data.type](data);
-		_$setting._timeout();
-		_$queue.splice(0,1);
-		WARN(data.type);		
-		if (_$queue.length > 0){
-			readData(_$queue[_$queue.length-1]);
-		} else {
-			_threadObj.working = false;
-		}
-	}
-}*/
-
 if (cluster.isWorker){
 	process.on('message', function(data){
 		if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
 		WARN("LOL");
 	});
 }
-/*var _$queue = [];
-function readData(data){
-	// Read data based on a queue
-	if (!_threadObj.working) _threadObj.working = true;
-	else return;
-	console.log(data.type);
-	if (typeof _threadObj[data.type] == 'function'){
-		_threadObj[data.type](data);
-		_$setting._timeout();
-		_$queue.splice(0,1);
-		WARN(data.type);		
-		//console.log(_$queue);
-		//WARN(_$queue.toString());
-		if (_$queue.length > 0){
-			readData(_$queue[_$queue.length-1]);
-		} else {
-			_threadObj.working = false;
-		}
-	}
-}
-
-if (cluster.isWorker){
-	_$setting._timeout();
-	process.on('message', function(data){
-		_$queue.push(data);
-		readData(data);	
-	});
-}*/
