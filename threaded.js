@@ -21,7 +21,8 @@ module.exports = class thread extends EventEmitter{
 	constructor(settings){
 		super();
 		this.threadSettings = settings;	
-		this.active = false;	
+		this.active = false;
+		this.worker;	
 	}	
 	add(targetThread, processFunc, args, _type){
 		// Adds in a packaged function (complete with arguments and type);
@@ -37,24 +38,23 @@ module.exports = class thread extends EventEmitter{
 		this.allThreads[targetThread].send(_package);
 		return true;
 	}
-	newThread(settings){
+	open(){
 		// Opens a new thread
-		var targetThread = this.allThreads.indexOf(null);
-		if (targetThread == -1){
+		//var targetThread = this.allThreads.indexOf(null);
+		/*if (targetThread == -1){
 			process.emitWarning("No more threads available");
 			return;
-		}
+		}*/
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
 			exec: "./threading.js",
 			silent: false
 		});
-		this.allThreads[targetThread] = cluster.fork();
-		settings = settings || {};
-		settings._id = targetThread;
-		this.allThreads[targetThread].send({type: "settings", args:settings});
-		this.allThreads[targetThread].setMaxListeners(0);
-		this.allThreads[targetThread].on("message", (msg)=>{
+		this.worker = cluster.fork();
+		this.threadSettings._id = targetThread;
+		this.worker.send({type: "settings", args:this.threadSettings});
+		this.worker.setMaxListeners(0);
+		this.worker.on("message", (msg)=>{
 			console.log(msg);
 			if (msg.status == "warning") {
 				//process.emitWarning(`[Thread: ${targetThread}] - ${msg.error}`);			
@@ -69,9 +69,9 @@ module.exports = class thread extends EventEmitter{
 		var targetThread = this.newThread(settings);
 		this.add(targetThread, processFunc, args);
 	}*/
-	async store(targetThread, processFunc){
+	async store(processFunc){
 		// Stores a function and sends a message to the screen when it is done storing.
-		if (arguments.length === 1) {
+		/*if (arguments.length === 1) {
 			processFunc = targetThread;
 			targetThread = false;
 		}
@@ -80,7 +80,8 @@ module.exports = class thread extends EventEmitter{
 		} else {
 			if (this.allThreads[0] === null) targetThread = this.newThread(this.threadSettings);
 			else targetThread = 0;
-		}
+		}*/
+		targetThread = this.open();
 		//console.log("THREAD" + targetThread);
 		//targetThread = (typeof targetThread === 'number') ? targetThread || this.newThread(this.threadSettings) : 0;
 		if (!this.add(targetThread, processFunc, {name: processFunc.name}, "store")) return false;
@@ -109,14 +110,16 @@ module.exports = class thread extends EventEmitter{
 		}
 		//var totalCount = 0;
 		//var startTime = new Date();
-		for (var i = 0; i < this.allThreads.length; i++){
+		/*for (var i = 0; i < this.allThreads.length; i++){
 			if (this.allThreads[i] === null) continue;
 			this.allThreads[i].send({type: "run", targetFunction: functionName, args: args});
 			this.runningThreads++;
 			//totalCount++;
-		}
+		}*/
+		this.worker.send({type: "run", targetFunction: functionName, args: args});
+		this.active = true;
 		//var allData = [];		
-		var returnedData = await this.waitAll();
+		var returnedData = await this.wait();
 		//allData.push(final);
 		//allData.push({duration: (new Date()).getTime() - startTime.getTime()});
 		//var copiedData = allData;
@@ -129,7 +132,7 @@ module.exports = class thread extends EventEmitter{
 		this.close();
 		return temp;
 	}		
-	async waitAll(){
+	async wait(){
 		// Return values for all threads that have completed
 		var _runThreads = 0+this.runningThreads;
 		var allData = [];
@@ -153,6 +156,9 @@ module.exports = class thread extends EventEmitter{
 		return final;
 	}
 	close(target){
+		this.worker.send({type:"quit"});
+		this.worker = null;
+		module.exports.OPEN_THREADS--;		
 			// Kills the target thread or all threads
 			/*if(arguments.length === 0) {
 				for (var i = 0; i < this.allThreads.length;i++){
