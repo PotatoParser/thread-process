@@ -16,48 +16,12 @@
 */
 const cluster = require('cluster');
 const EventEmitter = require('events'); 
-/*Object.defineProperty(Object.prototype, "override", {
-	enumerable: false,
-	value: function(secondObject){
-		for (var key in secondObject){
-			if (this[key] == undefined) this[key] = secondObject[key];
-		}
-	}
-});
-*/
 const MAX_THREADS = require('os').cpus().length;
 module.exports = class thread extends EventEmitter{
-	constructor(maxThreads, settings){
-		maxThreads = maxThreads || 1;
-		if (typeof maxThreads !== 'number') {
-			settings = maxThreads;
-			maxThreads = 1;
-		}
-		/*if (arguments.length == 0){
-			const maxCPU = require('os').cpus().length;
-			maxThreads = maxCPU;
-			maxThreads = MAX_THREADS;
-		}
-		*/
+	constructor(settings){
 		super();
-		this.threadSettings = settings;		
-		this.allThreads = [];
-		this.runningThreads = 0;
-		//this.threadData = [];
-		for (var i = 0; i < maxThreads;i++){
-			this.allThreads.push(null);
-		}
-		/*this.hiddenEvents = new EventEmitter();
-		this.hiddenEvents.on("store", async(targetThread, processFunc, args)=>{
-			if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
-			var temp = new Promise((resolve)=>{
-				this.allThreads[targetThread].once("message", (msg)=>{
-					console.log("Success at thread: " + targetThread);
-					if (msg.status === "stored") resolve();
-				});
-			});
-			return temp;
-		});*/
+		this.threadSettings = settings;	
+		this.active = false;	
 	}	
 	add(targetThread, processFunc, args, _type){
 		// Adds in a packaged function (complete with arguments and type);
@@ -165,23 +129,6 @@ module.exports = class thread extends EventEmitter{
 		this.close();
 		return temp;
 	}		
-	/*async start(runType, args){
-		runType = runType || "run";
-		//var totalCount = 0;
-		var startTime = new Date();
-		for (var i = 0; i < this.allThreads.length; i++){
-			if (this.allThreads[i] === null) continue;
-			this.allThreads[i].send({type: runType, args: args});
-			this.runningThreads++;
-			//totalCount++;
-		}
-		var final = await this.waitAll();
-		this.threadData.push({duration: (new Date()).getTime() - startTime.getTime()});
-		var copiedData = this.threadData;
-		this.emit("complete", copiedData);
-		if (runType == "runOnce") this.kill();
-		return copiedData;
-	}*/
 	async waitAll(){
 		// Return values for all threads that have completed
 		var _runThreads = 0+this.runningThreads;
@@ -207,7 +154,7 @@ module.exports = class thread extends EventEmitter{
 	}
 	close(target){
 			// Kills the target thread or all threads
-			if(arguments.length === 0) {
+			/*if(arguments.length === 0) {
 				for (var i = 0; i < this.allThreads.length;i++){
 					if (this.allThreads[i] !== null){
 						this.allThreads[i].send({type:"quit"});
@@ -225,73 +172,13 @@ module.exports = class thread extends EventEmitter{
 				} else {
 					// If the thread has not been opened
 				}
-			}
+			}*/
 		}	
-	/*kill(target){
-		// Kills the target thread or all threads
-		if(arguments.length === 0) {
-			for (var i = 0; i < this.allThreads.length;i++){
-				if (this.allThreads[i] !== null){
-					this.allThreads[i].send({type:"quit"});
-					this.allThreads[i] = null;
-					this.runningThreads--;
-				}
-			}
-			this.threadData = [];
-		} else {
-			if (this.allThreads[target] !== null){
-					this.allThreads[target].send({type:"quit"});
-					this.allThreads[target] = null;
-					this.runningThreads--;
-			} else {
-				// If the thread has not been opened
-			}
-		}
-	}*/
 	static async exec(processFunc, args, settings){
 		var temp = new thread(settings);
 		await temp.store(processFunc);
 		return await temp.runOnce(processFunc.name, args);
-		// TODO: Change to async
-		/*var event = new EventEmitter();
-		cluster.setMaxListeners(0);
-		//event.setMaxListeners(Infinity);
-		var newFunc = processFunc.toString();
-		var _package = {
-			type: "instant",
-			processFunc: newFunc,
-			functionName: newFunc.name,
-			args: args
-		}
-		if(!cluster.isMaster) return;
-		cluster.setupMaster({
-			exec: "./threading.js",
-			silent: false
-		});
-		var worker = cluster.fork();
-		worker.send(_package);
-		cluster.on("message", (worker, msg)=>{
-			console.log(msg.value);
-			event.emit("end", msg.value);
-		});
-		*/
 	}
-	/*run(targetThread, runType){
-		if (arguments.length === 1 && typeof targetThread === 'string')
-			runType = targetThread;
-		else runType = runType || "run";
-		if (typeof targetThread !== 'number') {
-			for (var i = 0; i < this.allThreads.length; i++) {
-				if (this.allThreads[i] === null) continue;
-				this.allThreads[i].send({type:runType});
-				this.runningThreads++;
-			}
-		} else {
-			if (this.allThreads[targetThread] === null) return;
-			this.allThreads[targetThread].send({type:runType});
-			this.runningThreads++;
-		}
-	}*/
 }
 module.exports.MAX_THREADS = MAX_THREADS;
 module.exports.OPEN_THREADS = 0;
