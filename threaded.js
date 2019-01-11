@@ -38,12 +38,6 @@ module.exports = class thread extends EventEmitter{
 		return true;
 	}
 	open(){
-		// Opens a new thread
-		//var targetThread = this.allThreads.indexOf(null);
-		/*if (targetThread == -1){
-			process.emitWarning("No more threads available");
-			return;
-		}*/
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
 			exec: "./threading.js",
@@ -63,26 +57,8 @@ module.exports = class thread extends EventEmitter{
 		module.exports.OPEN_THREADS++;
 		return 0;
 	}
-	/*store(processFunc, args, settings){
-		settings = settings || undefined;
-		var targetThread = this.newThread(settings);
-		this.add(targetThread, processFunc, args);
-	}*/
 	async store(processFunc){
-		// Stores a function and sends a message to the screen when it is done storing.
-		/*if (arguments.length === 1) {
-			processFunc = targetThread;
-			targetThread = false;
-		}
-		if (typeof targetThread === 'number') {
-			targetThread = targetThread || this.newThread(this.threadSettings);
-		} else {
-			if (this.allThreads[0] === null) targetThread = this.newThread(this.threadSettings);
-			else targetThread = 0;
-		}*/
 		this.open();
-		//console.log("THREAD" + targetThread);
-		//targetThread = (typeof targetThread === 'number') ? targetThread || this.newThread(this.threadSettings) : 0;
 		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.worker.once("message", (msg)=>{
@@ -100,23 +76,10 @@ module.exports = class thread extends EventEmitter{
 				functionName = null;
 			}
 		}
-		//var totalCount = 0;
-		//var startTime = new Date();
-		/*for (var i = 0; i < this.allThreads.length; i++){
-			if (this.allThreads[i] === null) continue;
-			this.allThreads[i].send({type: "run", targetFunction: functionName, args: args});
-			this.runningThreads++;
-			//totalCount++;
-		}*/
 		this.worker.send({type: "run", targetFunction: functionName, args: args});
 		this.active = true;
-		//var allData = [];		
 		var returnedData = await this.wait();
-		//allData.push(final);
-		//allData.push({duration: (new Date()).getTime() - startTime.getTime()});
-		//var copiedData = allData;
 		this.emit("complete", returnedData);
-		//if (runType == "runOnce") this.close();
 		return returnedData;
 	}	
 	async runOnce(functionName, args){
@@ -138,7 +101,6 @@ module.exports = class thread extends EventEmitter{
 					other++;
 				}
 				if (other === _runThreads){
-					//for (var i = 0; i < this.allThreads.length; i++) this.allThreads[i] = null;
 					resolve(allData);
 				}
 			});
@@ -151,7 +113,7 @@ module.exports = class thread extends EventEmitter{
 		this.worker.send({type:"quit"});
 		this.worker = null;
 		module.exports.OPEN_THREADS--;		
-		}	
+	}	
 	static async exec(processFunc, args, settings){
 		var temp = new thread(settings);
 		await temp.store(processFunc);
