@@ -102,9 +102,9 @@ var _threadObj = {
 	}
 }
 
-if (cluster.isWorker){
+//if (cluster.isWorker){
 	process.on('message', function(data){
 		if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
 		WARN("LOL");
 	});
-}
+//}
