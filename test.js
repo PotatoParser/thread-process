@@ -83,11 +83,11 @@ async function main(){
 	await temp.store(randomizer);
 	//await temp.store(control);	
 	//temp.on("complete", (data)=>{console.log(data)});
-	console.log(await temp.run("randomizer"));
-	console.log(await temp.run("randomizer"));
-	console.log(await temp.run("randomizer"));
-	console.log(await temp.run("randomizer"));
-	
+	console.log(await temp.run());
+	console.log(await temp.run());
+	console.log(await temp.run());
+	console.log(await temp.runOnce());
+
 	//var temp2 = await thread.exec(control, [10]);
 	//console.log(temp2);
 	//console.log(await temp.start());

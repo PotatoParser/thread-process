@@ -71,13 +71,13 @@ var _$setting = {
 		}, _$setting._delay);
 	}
 };
-function error(msg){
-	process.send({status: "error", error: msg});
+function WARN(msg){
+	process.send({status: "warning", error: msg});
 }
 var _threadObj = {
 	quit: (data)=>{
 		//console.log("QUITTING THREAD");
-		error("lol");
+		//WARN("lol");
 		process.exit(0);
 	},
 	instant: (data)=>{
@@ -137,6 +137,9 @@ function readData(data){
 		_threadObj[data.type](data);
 		_$setting._timeout();
 		_$queue.splice(0,1);
+		WARN(data.type);		
+		//console.log(_$queue);
+		//WARN(_$queue.toString());
 		if (_$queue.length > 0){
 			readData(_$queue[_$queue.length-1]);
 		} else {
@@ -149,6 +152,7 @@ if (cluster.isWorker){
 	_$setting._timeout();
 	process.on('message', function(data){
 		_$queue.push(data);
-		readData(data);		
+		readData(data);	
+		console.log(data);	
 	});
 }

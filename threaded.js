@@ -80,7 +80,6 @@ module.exports = class thread extends EventEmitter{
 			process.emitWarning("No more threads available");
 			return;
 		}
-
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
 			exec: "./threading.js",
@@ -91,9 +90,10 @@ module.exports = class thread extends EventEmitter{
 		settings._id = targetThread;
 		this.allThreads[targetThread].send({type: "settings", args:settings});
 		this.allThreads[targetThread].on("message", (msg)=>{
-			if (msg.status !== "error") return;
-			process.emitWarning(`[Thread: ${targetThread}]: ${msg.error}`);			
-			this.emit("error", {thread: targetThread, msg: msg.error});
+			if (msg.status == "warning") {
+				process.emitWarning(`[Thread: ${targetThread}] - ${msg.error}`);			
+				this.emit("warning", {thread: targetThread, msg: msg.error});
+			}
 		});
 		return targetThread;
 	}
@@ -181,12 +181,12 @@ module.exports = class thread extends EventEmitter{
 	}*/
 	async waitAll(){
 		// Return values for all threads that have completed
-		var _runThreads = this.runningThreads;
+		var _runThreads = 0+this.runningThreads;
 		var allData = [];
-		console.log("WAITING");
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			cluster.on("message", (worker, msg)=>{
+				console.log(msg.status);
 				if(msg.status === "done"){
 					allData.push(msg.value);
 					this.emit("end", msg.value);
@@ -198,7 +198,8 @@ module.exports = class thread extends EventEmitter{
 				}
 			});
 		});
-		if (this.runningThreads === 1) return final[0];
+		this.runningThreads = 0;
+		if (_runThreads === 1) return final[0];
 		return final;
 	}
 	close(target){
