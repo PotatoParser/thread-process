@@ -13,5 +13,13 @@
     "threads"
   ],
   "author": "Wilson Nguyen",
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PotatoParser/threadProcess.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PotatoParser/threadProcess/issues"
+  },
+  "homepage": "https://github.com/PotatoParser/threadProcess#readme"
 }

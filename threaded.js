@@ -41,7 +41,7 @@ module.exports = class thread extends EventEmitter{
 	open(){
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
-			exec: "./threading.js",
+			exec: __dirname + "threading.js",
 			silent: false
 		});
 		this.worker = cluster.fork();
