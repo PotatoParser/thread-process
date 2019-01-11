@@ -26,7 +26,6 @@ const EventEmitter = require('events');
 });
 */
 const MAX_THREADS = require('os').cpus().length;
-module.exports.MAX_THREADS = MAX_THREADS; // Obsolete
 module.exports = class thread extends EventEmitter{
 	constructor(maxThreads, settings){
 		maxThreads = maxThreads || 1;
@@ -91,8 +90,10 @@ module.exports = class thread extends EventEmitter{
 		settings = settings || {};
 		settings._id = targetThread;
 		this.allThreads[targetThread].send({type: "settings", args:settings});
-		this.allThreads[targetThread].on("error", (msg)=>{
-			this.emit("error", msg);
+		this.allThreads[targetThread].on("message", (msg)=>{
+			if (msg.status !== "error") return;
+			process.emitWarning(`[Thread: ${targetThread}]: ${msg.error}`);			
+			this.emit("error", {thread: targetThread, msg: msg.error});
 		});
 		return targetThread;
 	}
@@ -113,7 +114,7 @@ module.exports = class thread extends EventEmitter{
 			if (this.allThreads[0] === null) targetThread = this.newThread(this.threadSettings);
 			else targetThread = 0;
 		}
-		console.log("THREAD" + targetThread);
+		//console.log("THREAD" + targetThread);
 		//targetThread = (typeof targetThread === 'number') ? targetThread || this.newThread(this.threadSettings) : 0;
 		if (!this.add(targetThread, processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
@@ -121,7 +122,7 @@ module.exports = class thread extends EventEmitter{
 				if (msg.status === "stored") resolve(true);
 			});
 		});
-		console.log("STORED");
+		//console.log("STORED");
 		return temp;
 	}
 	/*storeReg(processFunc, args, settings) {
@@ -132,7 +133,7 @@ module.exports = class thread extends EventEmitter{
 		//if (!this.add(targetThread, processFunc, args, "storeAsync")) return;
 	}*/
 	async run(functionName, args){
-		console.log("RUNNING");
+		//console.log("RUNNING");
 		if (arguments.length === 1) {
 			if (typeof functionName === 'object') {
 				args = functionName;
@@ -182,6 +183,7 @@ module.exports = class thread extends EventEmitter{
 		// Return values for all threads that have completed
 		var _runThreads = this.runningThreads;
 		var allData = [];
+		console.log("WAITING");
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			cluster.on("message", (worker, msg)=>{
@@ -244,7 +246,7 @@ module.exports = class thread extends EventEmitter{
 	static async exec(processFunc, args, settings){
 		var temp = new thread(settings);
 		await temp.store(processFunc);
-		await temp.runOnce(processFunc.name, args);
+		return await temp.runOnce(processFunc.name, args);
 		// TODO: Change to async
 		/*var event = new EventEmitter();
 		cluster.setMaxListeners(0);
@@ -286,3 +288,4 @@ module.exports = class thread extends EventEmitter{
 		}
 	}*/
 }
+module.exports.MAX_THREADS = MAX_THREADS;

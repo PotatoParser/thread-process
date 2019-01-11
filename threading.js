@@ -71,9 +71,13 @@ var _$setting = {
 		}, _$setting._delay);
 	}
 };
+function error(msg){
+	process.send({status: "error", error: msg});
+}
 var _threadObj = {
 	quit: (data)=>{
-		console.log("QUITTING THREAD");
+		//console.log("QUITTING THREAD");
+		error("lol");
 		process.exit(0);
 	},
 	instant: (data)=>{
@@ -85,18 +89,18 @@ var _threadObj = {
 		processFunc.push({func: analyzeFunction(data.processFunc), args: data.args});
 	},*/
 	store: (data)=>{
-		console.log(data);
+		//console.log(data);
 		THREAD_DATA[data.args.name] = analyzeFunction(data.processFunc);
 		FOCUSED_FUNCTION = data.args.name;
 		//processFunc.push({func: analyzeFunction(data.processFunc, data.args), args: data.args});
 		process.send({status: "stored"});
 	},
 	run: async (data)=>{
-		console.log(THREAD_DATA);
+		//console.log(THREAD_DATA);
 		var startTime = new Date();
 		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
-		console.log(temp);
+		//console.log(temp);
 		// Sends the values when done
 		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
 		/*var startTime = new Date();
