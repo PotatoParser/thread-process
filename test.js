@@ -74,25 +74,32 @@ var randomizer = async ()=>{
 /*var control = (num)=>{
 	console.log("The magic number is: " + num);
 };*/
-function control(num){
+function control(){
+	const http = require('http');	
+		http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('hello world\n');
+  }).listen(8000);
 	console.log("Yikes");
 }
 async function main(){
 	var temp = new thread();
+	var temp2 = new thread();
 
 	//console.log(thread.MAX_THREADS);
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
 	await temp.store(control);
+	await temp2.store(control);
 
 	//await temp.store(control);	
 	//temp.on("complete", (data)=>{console.log(data)});
 	//console.log(await temp.run([1]));
 	//console.log(await temp.run([2]));
 	//console.log(await temp.run([3]));
-	console.log(thread.OPEN_THREADS);
-	console.log(await temp.runOnce([4]));
+	temp.run();
+	temp2.run();
 	console.log(thread.OPEN_THREADS);
 
 	//var temp2 = await thread.exec(control, [10]);
