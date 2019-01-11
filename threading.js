@@ -15,7 +15,6 @@
 
 */
 const cluster = require('cluster');
-global.yeet = 1;
 Object.defineProperty(Object.prototype, "overlap", {
 	enumerable: false,
 	value: function(newObject){
@@ -57,7 +56,7 @@ global.require = (mdl)=>{
 	return require(mdl);
 }
 global.THREAD_DATA = {};
-var FOCUSED_FUNCTION = "";
+global.FOCUSED_FUNCTION = "";
 //var processFunc = [];
 
 // Currently obsolete
@@ -101,10 +100,25 @@ var _threadObj = {
 		_$setting.overlap(data.args);
 	}
 }
-
+var QUEUE = [];
 //if (cluster.isWorker){
-	process.on('message', function(data){
-		if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
-		WARN("LOL");
+async function execute(){
+	if (QUEUE.length > 0) {
+		if (typeof _threadObj[QUEUE[0].type] == 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);	
+		QUEUE.splice(0,1);		
+		execute();	
+	}
+}
+	process.on('message', async (data)=>{
+		if (QUEUE.length == 0) {
+			QUEUE.push(data);
+			execute();
+			/*if (typeof _threadObj[QUEUE[0].type] == 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);
+			QUEUE.splice(0,1);*/
+		} else {
+			QUEUE.push(data);
+		}
+		//if (typeof _threadObj[data.type] == 'function') await _threadObj[data.type](data);
+		//WARN("LOL");
 	});
 //}

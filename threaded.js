@@ -85,7 +85,6 @@ module.exports = class thread extends EventEmitter{
 	async wait(){
 		// Return values for all threads that have completed
 		var _runThreads = 0+this.runningThreads;
-		var allData = [];
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			this.once("done", (msg)=>{
