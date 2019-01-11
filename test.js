@@ -72,6 +72,7 @@ var randomizer = async ()=>{
 	return totalString;
 }
 var control = (num)=>{
+	console.log(THREAD_DATA);
 	console.log("The magic number is: " + num);
 };
 async function main(){

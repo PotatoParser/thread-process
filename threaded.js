@@ -22,7 +22,8 @@ module.exports = class thread extends EventEmitter{
 		super();
 		this.threadSettings = settings || {};	
 		this.active = false;
-		this.worker;	
+		this.worker;
+		this.setMaxListeners(0);	
 	}	
 	add(processFunc, args, _type){
 		// Adds in a packaged function (complete with arguments and type);
@@ -48,12 +49,15 @@ module.exports = class thread extends EventEmitter{
 		this.worker.send({type: "settings", args:this.threadSettings});
 		this.worker.setMaxListeners(0);
 		this.worker.on("message", (msg)=>{
+			this.emit(msg.status, msg);
+		})
+		/*this.worker.on("message", (msg)=>{
 			console.log(msg);
 			if (msg.status == "warning") {
 				//process.emitWarning(`[Thread: ${targetThread}] - ${msg.error}`);			
 				//this.emit("warning", {thread: targetThread, msg: msg.error});
 			}
-		});
+		});*/
 		module.exports.OPEN_THREADS++;
 		return 0;
 	}
@@ -61,9 +65,10 @@ module.exports = class thread extends EventEmitter{
 		this.open();
 		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
-			this.worker.once("message", (msg)=>{
+			this.once("stored", ()=>resolve(true));
+			/*this.worker.once("message", (msg)=>{
 				if (msg.status === "stored") resolve(true);
-			});
+			});*/
 		});
 		//console.log("STORED");
 		return temp;
@@ -93,7 +98,7 @@ module.exports = class thread extends EventEmitter{
 		var allData = [];
 		var final = await new Promise((resolve)=>{
 			var other = 0;
-			cluster.on("message", (worker, msg)=>{
+			/*cluster.on("message", (worker, msg)=>{
 				console.log(msg.status);
 				if(msg.status === "done"){
 					allData.push(msg.value);
@@ -103,10 +108,15 @@ module.exports = class thread extends EventEmitter{
 				if (other === _runThreads){
 					resolve(allData);
 				}
+			});*/
+			this.once("done", (msg)=>{
+				this.emit("end", msg.value);
+				this.active = false;
+				resolve(msg.value);
 			});
 		});
-		this.runningThreads = 0;
-		if (_runThreads === 1) return final[0];
+		//this.runningThreads = 0;
+		//if (_runThreads === 1) return final[0];
 		return final;
 	}
 	close(target){
