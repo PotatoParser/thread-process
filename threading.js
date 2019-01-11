@@ -15,7 +15,7 @@
 
 */
 const cluster = require('cluster');
-
+global.yeet = 1;
 Object.defineProperty(Object.prototype, "overlap", {
 	enumerable: false,
 	value: function(newObject){
@@ -53,7 +53,10 @@ function analyzeFunction(stringFunc){
 	}
 	return finalFunction;
 }
-var THREAD_DATA = {};
+global.require = (mdl)=>{
+	return require(mdl);
+}
+global.THREAD_DATA = {};
 var FOCUSED_FUNCTION = "";
 //var processFunc = [];
 var _$setting = {
@@ -98,7 +101,8 @@ var _threadObj = {
 	run: async (data)=>{
 		//console.log(THREAD_DATA);
 		var startTime = new Date();
-		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;
+		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;		
+		//var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(global, data.args);
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
 		//console.log(temp);
 		// Sends the values when done
@@ -149,8 +153,8 @@ function readData(data){
 
 if (cluster.isWorker){
 	process.on('message', function(data){
-	if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
-	WARN("LOL");
+		if (typeof _threadObj[data.type] == 'function') _threadObj[data.type](data);
+		WARN("LOL");
 	});
 }
 /*var _$queue = [];

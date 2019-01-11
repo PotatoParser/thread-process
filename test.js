@@ -71,23 +71,29 @@ var randomizer = async ()=>{
 	};
 	return totalString;
 }
-var control = (num)=>{
-	//console.log(global.THREAD_DATA);
+/*var control = (num)=>{
 	console.log("The magic number is: " + num);
-};
+};*/
+function control(num){
+	console.log("Yikes");
+}
 async function main(){
 	var temp = new thread();
+
 	//console.log(thread.MAX_THREADS);
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
 	await temp.store(control);
+
 	//await temp.store(control);	
 	//temp.on("complete", (data)=>{console.log(data)});
-	console.log(await temp.run([1]));
-	console.log(await temp.run([2]));
-	console.log(await temp.run([3]));
+	//console.log(await temp.run([1]));
+	//console.log(await temp.run([2]));
+	//console.log(await temp.run([3]));
+	console.log(thread.OPEN_THREADS);
 	console.log(await temp.runOnce([4]));
+	console.log(thread.OPEN_THREADS);
 
 	//var temp2 = await thread.exec(control, [10]);
 	//console.log(temp2);
