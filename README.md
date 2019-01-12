@@ -33,11 +33,13 @@ new thread({_delay: 3000}); // Constructing a thread with custom settings
 ### Settings Available
 **_delay: time in ms of inactivity to automatically close the thread**
 ## Storing functions *(Asynchronous)*
+*(Async) returns the function stored*
 ```javascript
-thr.store();
+thr.store(FUNCTION_NAME);
 ```
 ## Running Functions *(Asynchronous)*
 Run the most recent function stored or executed by the thread
+*(Async) returns the data returned by the function executed*
 ```javascript
 thr.run();
 thr.runOnce(); // Closes the thread after running
@@ -57,8 +59,9 @@ thr.close();
 ```
 # Immediate Thread *(Asynchronous)*
 Runs a function within a thread and immediately closes the thread upon completion
+*(Async) returns the data returned by the function executed*
 ```javascript
-thr.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
+thread.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
 ```
 # Example Usage
 Asynchronous management of threads & passing values
