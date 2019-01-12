@@ -1,11 +1,10 @@
 # **Thread Process**
 Threading with JS through NodeJS Cluster
-# Example Usage
 ```javascript
 var thread = require("thread-process");
 
 function temp() {
-	console.log("Hello World -Thread");
+    console.log("Hello World ~Thread");
 }
 
 var thr = new thread();
@@ -13,6 +12,13 @@ thr.store(temp);
 thr.run();
 thr.close();
 ```
+# Features
++ Supports "require" in "threaded" functions
++ Supports servers on http and https
++ Multiple threads running simultaneously
++ Thread emitted events
++ Thread cleanup
+
 # Thread class
 ## Properties
 ```javascript
@@ -35,7 +41,6 @@ Run the most recent function stored or executed by the thread
 ```javascript
 thr.run();
 thr.runOnce(); // Closes the thread after running
-thr.run();
 ```
 Run target function stored in the thread
 ```javascript
@@ -55,10 +60,30 @@ Runs a function within a thread and immediately closes the thread upon completio
 ```javascript
 thr.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
 ```
-# Features
-+ Supports "require" in "threaded" functions
-+ Supports servers on http and https
-+ Multiple threads running simultaneously
-+ Thread emitted events
-+ Thread cleanup
-
+# Example Usage
+Asynchronous management of threads & passing values
+```javascript
+var thread = require("thread-process");
+var temp = async (text)=>{
+    console.log(`Async! ${text}`);
+}
+async function main(){
+    var tp = new thread();
+    await tp.store(temp);
+    await tp.runOnce(["~ Thread"]);
+}
+main();
+```
+Multiple stored functions
+```javascript
+var thread = require("thread-process");
+var func1 = ()=>{console.log("First function!")}
+var func2 = ()=>{console.log("Second function!")}
+async function main(){
+    var tp = new thread();
+    await tp.store(func1);
+    await tp.store(func2);
+    await tp.runOnce("func1");
+}
+main();
+```
