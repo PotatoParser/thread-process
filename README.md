@@ -39,6 +39,7 @@ thr.store(FUNCTION_NAME);
 ```
 ## Running Functions *(Asynchronous)*
 Run the most recent function stored or executed by the thread
+
 *(Async) returns the data returned by the function executed*
 ```javascript
 thr.run();
@@ -59,6 +60,7 @@ thr.close();
 ```
 # Immediate Thread *(Asynchronous)*
 Runs a function within a thread and immediately closes the thread upon completion
+
 *(Async) returns the data returned by the function executed*
 ```javascript
 thread.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
