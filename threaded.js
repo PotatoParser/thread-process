@@ -17,7 +17,7 @@
 const cluster = require('cluster');
 const EventEmitter = require('events'); 
 const MAX_THREADS = require('os').cpus().length;
-module.exports = class thread extends EventEmitter{
+module.exports = class Thread extends EventEmitter{
 	constructor(settings){
 		super();
 		this.threadSettings = settings || {};	
