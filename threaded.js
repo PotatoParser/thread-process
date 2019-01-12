@@ -41,7 +41,7 @@ module.exports = class thread extends EventEmitter{
 	open(){
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
-			exec: __dirname + "threading.js",
+			exec: __dirname + "/threading.js",
 			silent: false
 		});
 		this.worker = cluster.fork();
@@ -61,10 +61,9 @@ module.exports = class thread extends EventEmitter{
 			this.once("stored", ()=>resolve(true));
 		});
 		//console.log("STORED");
-		return temp;
+		return processFunc;
 	}
 	async run(functionName, args){
-		//console.log("RUNNING");
 		if (arguments.length === 1) {
 			if (typeof functionName === 'object') {
 				args = functionName;
@@ -103,7 +102,8 @@ module.exports = class thread extends EventEmitter{
 	static async exec(processFunc, args, settings){
 		var temp = new thread(settings);
 		await temp.store(processFunc);
-		return await temp.runOnce(processFunc.name, args);
+		var finalData = await temp.runOnce(processFunc.name, args);
+		return finalData;
 	}
 }
 module.exports.MAX_THREADS = MAX_THREADS;

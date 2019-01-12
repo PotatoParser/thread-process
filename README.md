@@ -87,3 +87,10 @@ async function main(){
 }
 main();
 ```
+Using **then** instead of async/await
+```javascript
+var thread = require("thread-process");
+var temp = ()=>{console.log("Hello World!")}
+var tp = new thread();
+tp.store(temp).then((result)=>{tp.runOnce();});
+```
