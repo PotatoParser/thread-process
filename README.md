@@ -53,7 +53,7 @@ thr.close();
 # Immediate Thread *(Asynchronous)*
 Runs a function within a thread and immediately closes the thread upon completion
 ```javascript
-thr.exec(<function>, [arg1,arg2,arg3], <settings>);
+thr.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
 ```
 # Features
 + Supports "require" in "threaded" functions
