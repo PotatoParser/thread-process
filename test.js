@@ -75,17 +75,20 @@ var randomizer = async ()=>{
 	console.log("The magic number is: " + num);
 };*/
 function control(){
-	return "Hello World";
+	return 1;
 }
 async function main(){
-	var temp = new thread();
+	var temp = new thread(control);
+	var temp2 = new thread(control);
+
 	//var temp2 = new thread();
 
 	//console.log(thread.MAX_THREADS);
 	/*temp.on("end", (data)=>{
 		console.log(data);
 	});*/
-	await temp.store(control);
+	//Promise.all([temp.run(), temp2.run()]).then((result)=>{console.log(result)});
+	thread.runAll(temp.runOnce(), temp2.runOnce()).then((result)=>{console.log(result);});
 	//await temp2.store(control);
 
 	//await temp.store(control);	
@@ -93,7 +96,7 @@ async function main(){
 	//console.log(await temp.run([1]));
 	//console.log(await temp.run([2]));
 	//console.log(await temp.run([3]));
-	console.log(await temp.run());
+	//console.log(await temp.run());
 	//console.log(int32[0]); // 123	
 	//temp2.run();
 	console.log("OPEN: " + thread.OPEN_THREADS);
@@ -123,8 +126,8 @@ async function main(){
 	console.log("DONE");
 	*/
 }
-//main();
+main();
 //var thread = require("thread-process");
-var temp = ()=>{return "Hello World"}
-var tp = new thread();
-tp.store(temp).then((result)=>{tp.runOnce().then((result2)=>{console.log(result2)});});
+//var temp = ()=>{return "Hello World"}
+//var tp = new thread();
+//tp.store(temp).then((result)=>{tp.runOnce().then((result2)=>{console.log(result2)});});

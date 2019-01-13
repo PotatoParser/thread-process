@@ -17,13 +17,26 @@
 const cluster = require('cluster');
 const EventEmitter = require('events'); 
 const MAX_THREADS = require('os').cpus().length;
+function error(text){
+	console.error("Thread-Process", new Error(text));
+	process.exit(-1);
+}
 module.exports = class Thread extends EventEmitter{
 	constructor(settings){
 		super();
-		this.threadSettings = settings || {};	
 		this.active = false;
 		this.worker;
-		this.setMaxListeners(0);	
+		this.setMaxListeners(0);		
+		//this.threadSettings = settings || {};
+		if (arguments.length === 0) this.threadSettings = {};	
+		else {
+			if (typeof settings === 'object') {
+				this.threadSettings = settings;
+			} else if (typeof settings === 'function') {
+				this.threadSettings = {};
+				this.store(settings);
+			} else error("Invalid parameters in Thread constructor");
+		}
 	}	
 	add(processFunc, args, _type){
 		// Adds in a packaged function (complete with arguments and type);
@@ -83,7 +96,7 @@ module.exports = class Thread extends EventEmitter{
 	}		
 	async wait(){
 		// Return values for all threads that have completed
-		var _runThreads = 0+this.runningThreads;
+		//var _runThreads = 0+this.runningThreads;
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			this.once("done", (msg)=>{
@@ -104,6 +117,9 @@ module.exports = class Thread extends EventEmitter{
 		await temp.store(processFunc);
 		var finalData = await temp.runOnce(processFunc.name, args);
 		return finalData;
+	}
+	static async runAll(){
+		return await Promise.all(arguments);
 	}
 }
 module.exports.MAX_THREADS = MAX_THREADS;

@@ -88,10 +88,10 @@ var _threadObj = {
 		process.send({status: "stored"});
 	},
 	run: async (data)=>{
-		var startTime = new Date();
+		//var startTime = new Date();
 		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;		
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
-		process.send({status: "done", value: {value: temp, time: (new Date()).getTime() - startTime.getTime()}});		
+		process.send({status: "done", value: temp});		
 	},
 	newTarget: (data)=>{
 		FOCUSED_FUNCTION = data.target;

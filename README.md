@@ -1,7 +1,7 @@
 ![Thread Process](https://github.com/PotatoParser/threadProcess/blob/master/thread-process.png?raw=true)
 Threading with JS through NodeJS Cluster
 ```javascript
-var thread = require("thread-process");
+const thread = require("thread-process");
 
 function temp() {
     console.log("Hello World ~Thread");
@@ -28,7 +28,8 @@ thread.OPEN_THREADS // Gets the count of how many threads are active
 ## Constructor
 ```javascript
 new thread(); // Constructing a thread with default settings
-new thread({_delay: 3000}); // Constructing a thread with custom settings
+new thread(function, options); // Stores a function
+new thread(settings); // Constructing a thread with custom settings
 ```
 ### Settings Available
 **_delay: time in ms of inactivity to automatically close the thread**
@@ -52,7 +53,13 @@ thr.run("temp"); // Runs temp()
 Run with arguments
 ```javascript
 thr.run("temp", [arg1,arg2,arg3]) // temp(arg1, arg2, arg3)
-thr.run([arg1,arg2,arg3]) // mostRecentFunction(arg1, arg2, arg3);
+thr.run([arg1,arg2,arg3])
+```
+## Running Multiple Threads *(Asynchronous)*
+
+*(Async) returns data as an Array*
+```javascript
+thread.runAll(thr.run(), ...);
 ```
 ## Closing Threads
 ```javascript
@@ -68,7 +75,6 @@ thread.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
 # Example Usage
 Asynchronous management of threads & passing values
 ```javascript
-var thread = require("thread-process");
 var temp = async (text)=>{
     console.log(`Async! ${text}`);
 }
@@ -81,7 +87,6 @@ main();
 ```
 Multiple stored functions
 ```javascript
-var thread = require("thread-process");
 var func1 = ()=>{console.log("First function!")}
 var func2 = ()=>{console.log("Second function!")}
 async function main(){
@@ -94,8 +99,14 @@ main();
 ```
 Using **then** instead of async/await
 ```javascript
-var thread = require("thread-process");
 var temp = ()=>{console.log("Hello World!")}
 var tp = new thread();
 tp.store(temp).then((result)=>{tp.runOnce();});
+```
+Running simultaneous threads
+```javascript
+var temp = ()=>{return "Hello";}
+var tp = new thread(temp);
+var tp2 = new thread(temp);
+thread.runAll(tp.runOnce(), tp.runOnce()).then((result)=>console.log(result));
 ```
