@@ -35,7 +35,9 @@ thr.close();
 + Thread cleanup
 
 # Installing
-`npm install thread-process`
+```
+$ npm install thread-process
+```
 # Initializing
 ```javascript
 const thread = require("thread-process");
