@@ -15,8 +15,8 @@ thr.close();
 # Table of Contents
 + [Features](#features)
 + [Initializing](#initializing)
++ [Properties](#properties)
 + [Thread Class](#thread-class)
-	+ [Properties](#properties)
 	+ [Constructor](#constructor)
 	+ [Storing functions](#storing-functions-asynchronous)
 	+ [Global Variables Accessible](#global-variables-accessible)
@@ -37,12 +37,12 @@ thr.close();
 ```javascript
 const thread = require("thread-process");
 ```
-# Thread Class
-## Properties
+# Properties
 ```javascript
 thread.MAX_THREADS // Gets the maximum CPU count
 thread.OPEN_THREADS // Gets the count of how many threads are active
 ```
+# Thread Class
 ## Constructor
 ```javascript
 new thread(); // Constructing a thread with default settings
