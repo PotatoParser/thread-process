@@ -59,22 +59,6 @@ global.THREAD_DATA = {};
 global.FOCUSED_FUNCTION = "";
 //var processFunc = [];
 
-// Currently obsolete
-var _$setting = {
-	_id: null,
-	_target: null,
-	_delay: "infinite",
-	_idle: null,
-	_timeout: ()=>{
-		if (typeof _$setting._delay != 'number') {
-			return;
-		}
-		clearTimeout(_$setting._idle);
-		_$setting._idle = setTimeout(()=>{
-			_threadObj.quit();
-		}, _$setting._delay);
-	}
-};
 function WARN(msg){
 	process.send({status: "warning", error: msg});
 }
@@ -95,9 +79,6 @@ var _threadObj = {
 	},
 	newTarget: (data)=>{
 		FOCUSED_FUNCTION = data.target;
-	},
-	settings: (data)=>{
-		_$setting.overlap(data.args);
 	}
 }
 var QUEUE = [];

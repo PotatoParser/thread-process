@@ -28,11 +28,8 @@ thread.OPEN_THREADS // Gets the count of how many threads are active
 ## Constructor
 ```javascript
 new thread(); // Constructing a thread with default settings
-new thread(function, options); // Stores a function
-new thread(settings); // Constructing a thread with custom settings
+new thread(function); // Stores a function
 ```
-### Settings Available
-**_delay: time in ms of inactivity to automatically close the thread**
 ## Storing functions *(Asynchronous)*
 *(Async) returns the function stored*
 ```javascript

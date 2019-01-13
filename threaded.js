@@ -22,20 +22,15 @@ function error(text){
 	process.exit(-1);
 }
 module.exports = class Thread extends EventEmitter{
-	constructor(settings){
+	constructor(processFunc){
 		super();
 		this.active = false;
 		this.worker;
 		this.setMaxListeners(0);		
 		//this.threadSettings = settings || {};
-		if (arguments.length === 0) this.threadSettings = {};	
-		else {
-			if (typeof settings === 'object') {
-				this.threadSettings = settings;
-			} else if (typeof settings === 'function') {
-				this.threadSettings = {};
-				this.store(settings);
-			} else error("Invalid parameters in Thread constructor");
+		if (arguments.length != 0) {
+			if (typeof processFunc === "function") this.store(processFunc);
+			else error("Invalid parameters in Thread constructor");
 		}
 	}	
 	add(processFunc, args, _type){
@@ -58,8 +53,6 @@ module.exports = class Thread extends EventEmitter{
 			silent: false
 		});
 		this.worker = cluster.fork();
-		this.threadSettings["_id"] = 0;
-		this.worker.send({type: "settings", args:this.threadSettings});
 		this.worker.setMaxListeners(0);
 		this.worker.on("message", (msg)=>{
 			this.emit(msg.status, msg);
