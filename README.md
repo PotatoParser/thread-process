@@ -12,6 +12,20 @@ thr.store(temp);
 thr.run();
 thr.close();
 ```
+# Table of Contents
++ [Features](#features)
++ [Initializing](#initializing)
++ [Thread Class](#thread-class)
+	+ [Properties](#properties)
+	+ [Constructor](#constructor)
+	+ [Storing functions](#storing-functions-asynchronous)
+	+ [Global Variables Accessible](#global-variables-accessible)
+	+ [Running Functions](#running-functions-asynchronous)
+	+ [Running Multiple Threads](#running-multiple-threads-asynchronous)
+	+ [Closing Threads](#closing-threads)
++ [Immediate Thread](#immediate-thread-asynchronous)
++ [Example Usage](#example-usage)
+
 # Features
 + Supports "require" in "threaded" functions
 + Supports storing both synchronous and asynchronous functions
@@ -19,11 +33,11 @@ thr.close();
 + Thread emitted events
 + Thread cleanup
 
-# Thread class
-## Initializing
+# Initializing
 ```javascript
 const thread = require("thread-process");
 ```
+# Thread Class
 ## Properties
 ```javascript
 thread.MAX_THREADS // Gets the maximum CPU count
@@ -34,7 +48,7 @@ thread.OPEN_THREADS // Gets the count of how many threads are active
 new thread(); // Constructing a thread with default settings
 new thread(function); // Stores a function
 ```
-## Storing functions *(Asynchronous)*
+## Storing Functions *(Asynchronous)*
 *(Async) returns the function stored*
 ```javascript
 thr.store(function);
