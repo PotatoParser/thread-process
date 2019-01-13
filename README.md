@@ -1,4 +1,4 @@
-![Thread Process](https://raw.githubusercontent.com/PotatoParser/threadProcess/master/thread-process.png?token=ArbrXZRAq-ZUYcfIyKuTMpwOU8w7VSD5ks5cOne-wA%3D%3D)
+![Thread Process](https://github.com/PotatoParser/threadProcess/blob/master/thread-process.png?raw=true)
 Threading with JS through NodeJS Cluster
 ```javascript
 var thread = require("thread-process");
