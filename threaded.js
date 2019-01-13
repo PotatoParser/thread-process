@@ -105,9 +105,8 @@ module.exports = class Thread extends EventEmitter{
 		this.worker = null;
 		module.exports.OPEN_THREADS--;		
 	}	
-	static async exec(processFunc, args, settings){
-		var temp = new thread(settings);
-		await temp.store(processFunc);
+	static async exec(processFunc, args){
+		var temp = new Thread(processFunc);
 		var finalData = await temp.runOnce(processFunc.name, args);
 		return finalData;
 	}

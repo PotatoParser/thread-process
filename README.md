@@ -14,7 +14,7 @@ thr.close();
 ```
 # Features
 + Supports "require" in "threaded" functions
-+ Supports servers on http and https
++ Supports storing both synchronous and asynchronous functions
 + Multiple threads running simultaneously
 + Thread emitted events
 + Thread cleanup
@@ -33,7 +33,7 @@ new thread(function); // Stores a function
 ## Storing functions *(Asynchronous)*
 *(Async) returns the function stored*
 ```javascript
-thr.store(FUNCTION_NAME);
+thr.store(function);
 ```
 ## Running Functions *(Asynchronous)*
 Run the most recent function stored or executed by the thread
@@ -49,7 +49,7 @@ thr.run("temp"); // Runs temp()
 ```
 Run with arguments
 ```javascript
-thr.run("temp", [arg1,arg2,arg3]) // temp(arg1, arg2, arg3)
+thr.run(function.name, [arg1,arg2,arg3]) // temp(arg1, arg2, arg3)
 thr.run([arg1,arg2,arg3])
 ```
 ## Running Multiple Threads *(Asynchronous)*
@@ -67,7 +67,8 @@ Runs a function within a thread and immediately closes the thread upon completio
 
 *(Async) returns the data returned by the function executed*
 ```javascript
-thread.exec(FUNCTION, [arg1,arg2,arg3], SETTING_OBJ);
+thread.exec(function);
+thread.exec(function, [arg1,arg2,arg3]);
 ```
 # Example Usage
 Asynchronous management of threads & passing values
