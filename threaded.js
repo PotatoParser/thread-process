@@ -18,7 +18,7 @@ const cluster = require('cluster');
 const EventEmitter = require('events'); 
 const MAX_THREADS = require('os').cpus().length;
 function error(text){
-	console.error("Thread-Process", new Error(text));
+	console.error("[Thread-Process]", new Error(text));
 	process.exit(-1);
 }
 module.exports = class Thread extends EventEmitter{

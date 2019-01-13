@@ -14,6 +14,7 @@ thr.close();
 ```
 # Table of Contents
 + [Features](#features)
++ [Installing](#installing)
 + [Initializing](#initializing)
 + [Properties](#properties)
 + [Thread Class](#thread-class)
@@ -33,6 +34,8 @@ thr.close();
 + Thread emitted events
 + Thread cleanup
 
+# Installing
+`npm install thread-process`
 # Initializing
 ```javascript
 const thread = require("thread-process");

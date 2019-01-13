@@ -4,7 +4,7 @@ var temp = (text)=>{
     console.log(FOCUSED_FUNCTION); // Outputs "temp"
 }
 async function main(){
-    var tp = new thread();
+    var tp = new thread("oof");
     await tp.store(temp);
     await tp.runOnce();
 }
