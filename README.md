@@ -35,6 +35,7 @@ thr.close();
 + Thread cleanup
 
 # Installing
+Requires prior installation of NodeJS
 ```
 $ npm install thread-process
 ```
