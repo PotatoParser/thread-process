@@ -1,5 +1,5 @@
 ![Thread Process](https://github.com/PotatoParser/threadProcess/blob/master/thread-process.png?raw=true)
-Threading with JS through NodeJS Cluster
+Simple Threading with JS through NodeJS Cluster
 ```javascript
 const thread = require("thread-process");
 
@@ -20,6 +20,10 @@ thr.close();
 + Thread cleanup
 
 # Thread class
+## Initializing
+```javascript
+const thread = require("thread-process");
+```
 ## Properties
 ```javascript
 thread.MAX_THREADS // Gets the maximum CPU count
@@ -34,6 +38,11 @@ new thread(function); // Stores a function
 *(Async) returns the function stored*
 ```javascript
 thr.store(function);
+```
+## Global Variables Accessible
+```javscript
+THREAD_DATA // (Object) Contains all the functions stored
+FOCUSED_FUNCTION // (String) The most recent function
 ```
 ## Running Functions *(Asynchronous)*
 Run the most recent function stored or executed by the thread
@@ -71,6 +80,19 @@ thread.exec(function);
 thread.exec(function, [arg1,arg2,arg3]);
 ```
 # Example Usage
+Using thread variables
+```javascript
+var temp = (text)=>{
+    console.log(THREAD_DATA);
+    console.log(FOCUSED_FUNCTION); // Outputs "temp"
+}
+async function main(){
+    var tp = new thread();
+    await tp.store(temp);
+    await tp.runOnce();
+}
+main();
+```
 Asynchronous management of threads & passing values
 ```javascript
 var temp = async (text)=>{
