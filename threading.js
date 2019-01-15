@@ -10,8 +10,9 @@ Object.defineProperty(Object.prototype, "overlap", {
 	}
 });
 
-// Converts the function text into an actual function
 const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+
+// Converts the function text into an actual function
 function analyzeFunction(stringFunc){
 	stringFunc = stringFunc.trim();
 	var asynchronous = false;
@@ -43,6 +44,8 @@ function analyzeFunction(stringFunc){
 	}
 	return finalFunction;	
 }
+
+// Defining global variables
 global.require = (mdl)=>{
 	return require(mdl);
 }
@@ -51,11 +54,8 @@ global.FOCUSED_FUNCTION = "";
 global.RETURN = (data)=>{
 	process.send({status: "returned", value: data});
 };
-//var processFunc = [];
 
-function WARN(msg){
-	process.send({status: "warning", error: msg});
-}
+// Used to process commands
 var _threadObj = {
 	quit: (data)=>{
 		process.exit(0);
@@ -76,7 +76,8 @@ var _threadObj = {
 	}
 }
 var QUEUE = [];
-//if (cluster.isWorker){
+
+// Queue system
 async function execute(){
 	if (QUEUE.length > 0) {
 		if (typeof _threadObj[QUEUE[0].type] == 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);	
@@ -84,16 +85,9 @@ async function execute(){
 		execute();	
 	}
 }
-	process.on('message', async (data)=>{
-		if (QUEUE.length == 0) {
-			QUEUE.push(data);
-			execute();
-			/*if (typeof _threadObj[QUEUE[0].type] == 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);
-			QUEUE.splice(0,1);*/
-		} else {
-			QUEUE.push(data);
-		}
-		//if (typeof _threadObj[data.type] == 'function') await _threadObj[data.type](data);
-		//WARN("LOL");
-	});
-//}
+process.on('message', async (data)=>{
+	if (QUEUE.length == 0) {
+		QUEUE.push(data);
+		execute();
+	} else QUEUE.push(data);
+});

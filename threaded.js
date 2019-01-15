@@ -11,18 +11,16 @@ module.exports = class Thread extends EventEmitter{
 		this.active = false;
 		this.worker;
 		this.setMaxListeners(0);		
-		//this.threadSettings = settings || {};
 		if (arguments.length != 0) {
 			if (typeof processFunc === "function") this.store(processFunc);
 			else error("Invalid parameters in Thread constructor");
 		}
-	}	
+	}
+	// Sends a store command
 	add(processFunc, args, _type){
-		// Adds in a packaged function (complete with arguments and type);
-		_type = _type || "store";
 		var newFunc = processFunc.toString();
 		var _package = {
-			type: _type,
+			type: "store",
 			processFunc: newFunc,
 			args: args
 		}
@@ -30,6 +28,7 @@ module.exports = class Thread extends EventEmitter{
 		this.worker.send(_package);
 		return true;
 	}
+	// Opening a thread
 	open(){
 		if(!cluster.isMaster) return;
 		cluster.setupMaster({
@@ -45,13 +44,13 @@ module.exports = class Thread extends EventEmitter{
 		module.exports.OPEN_THREADS++;
 		return 0;
 	}
+	// Storing functions
 	async store(processFunc){
 		this.open();
 		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
 			this.once("stored", (msg)=>resolve(true));
 		});
-		//console.log("STORED");
 		return processFunc;
 	}
 	async run(functionName, args){
@@ -73,12 +72,9 @@ module.exports = class Thread extends EventEmitter{
 		return temp;
 	}		
 	async wait(){
-		// Return values for all threads that have completed
-		//var _runThreads = 0+this.runningThreads;
 		var final = await new Promise((resolve)=>{
 			var other = 0;
 			this.once("completed", (msg)=>{
-				//this.emit("end", msg.value);
 				this.active = false;
 				resolve(msg);
 			});
