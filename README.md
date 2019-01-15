@@ -92,7 +92,6 @@ thread.runAll(thr.run(), ...);
 ## Events
 Event handling can make life much easier!
 ```javascript
-thr.on("warning", (data)=>{}); // Contains warning data
 thr.on("completed", (data)=>{}); // Contains the returned data
 thr.on("returned", (data)=>{}); // Contains data returned by RETURN(data);
 ```
