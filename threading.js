@@ -41,6 +41,9 @@ global.require = (mdl)=>{
 }
 global.THREAD_DATA = {};
 global.FOCUSED_FUNCTION = "";
+global.RETURN = (data)=>{
+	process.send({status: "returned", value: data});
+};
 //var processFunc = [];
 
 function WARN(msg){
@@ -59,7 +62,7 @@ var _threadObj = {
 		//var startTime = new Date();
 		FOCUSED_FUNCTION = data.targetFunction || FOCUSED_FUNCTION;		
 		var temp = await THREAD_DATA[FOCUSED_FUNCTION].apply(null, data.args);
-		process.send({status: "done", value: temp});		
+		process.send({status: "completed", value: temp});		
 	},
 	newTarget: (data)=>{
 		FOCUSED_FUNCTION = data.target;

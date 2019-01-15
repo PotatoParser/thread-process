@@ -59,10 +59,21 @@ new thread(function); // Stores a function
 ```javascript
 thr.store(function);
 ```
+## Function Formats
+Thread-Process currently supports the following function formats
+```javascript
+()=>{}
+function functionName(){}
+```
+The following is an illegal function format
+```javascript
+()=>function();
+```
 ## Global Variables Accessible
 ```javscript
 THREAD_DATA // (Object) Contains all the functions stored
 FOCUSED_FUNCTION // (String) The most recent function
+RETURN(data); // Sends data from the function to the main thread
 ```
 ## Running Functions *(Asynchronous)*
 Run the most recent function stored or executed by the thread
@@ -86,6 +97,13 @@ thr.run([arg1,arg2,arg3])
 *(Async) returns data as an Array*
 ```javascript
 thread.runAll(thr.run(), ...);
+```
+## Events
+Event handling can make life much easier!
+```javascript
+thr.on("warning", (data)=>{}); // Contains warning data
+thr.on("completed", (data)=>{}); // Contains the returned data
+thr.on("returned", (data)=>{}); // Contains data returned by RETURN(data);
 ```
 ## Closing Threads
 ```javascript
@@ -149,4 +167,14 @@ var temp = ()=>{return "Hello";}
 var tp = new thread(temp);
 var tp2 = new thread(temp);
 thread.runAll(tp.runOnce(), tp.runOnce()).then((result)=>console.log(result));
+```
+Running with events
+```javascript
+var temp = ()=>{RETURN("Hello")};
+var tp = new thread(temp);
+tp.on("returned", (data)=>{
+    console.log(data);
+    tp.close();
+});
+tp.run();
 ```

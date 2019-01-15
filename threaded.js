@@ -39,7 +39,8 @@ module.exports = class Thread extends EventEmitter{
 		this.worker = cluster.fork();
 		this.worker.setMaxListeners(0);
 		this.worker.on("message", (msg)=>{
-			this.emit(msg.status, msg);
+			if (msg.status != "stored") this.emit(msg.status, msg.value);
+			else this.emit(msg.status, new Error(`"stored" is an invalid event`));
 		})
 		module.exports.OPEN_THREADS++;
 		return 0;
@@ -48,7 +49,7 @@ module.exports = class Thread extends EventEmitter{
 		this.open();
 		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
 		var temp = new Promise((resolve)=>{
-			this.once("stored", ()=>resolve(true));
+			this.once("stored", (msg)=>resolve(true));
 		});
 		//console.log("STORED");
 		return processFunc;
@@ -76,10 +77,10 @@ module.exports = class Thread extends EventEmitter{
 		//var _runThreads = 0+this.runningThreads;
 		var final = await new Promise((resolve)=>{
 			var other = 0;
-			this.once("done", (msg)=>{
-				this.emit("end", msg.value);
+			this.once("completed", (msg)=>{
+				//this.emit("end", msg.value);
 				this.active = false;
-				resolve(msg.value);
+				resolve(msg);
 			});
 		});
 		return final;
