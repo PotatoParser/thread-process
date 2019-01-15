@@ -19,22 +19,29 @@ function analyzeFunction(stringFunc){
 		stringFunc = stringFunc.substring(5).trim();
 		asynchronous = true;
 	}
-	var other = new RegExp(" ", 'g');
-	var firstPart = stringFunc.indexOf(")");
-	var firstCurl = stringFunc.indexOf("{");
-	var arrow = stringFunc.indexOf("=>");
-	if (arrow !== -1 && arrow > firstPart && arrow < firstCurl) {
-		stringFunc = stringFunc.substring(0, firstPart+1) + stringFunc.substring(arrow+2);
+	var parameters = [];
+	var body = "";
+	var indexFunc = stringFunc.indexOf("function");
+	var indexArrow = stringFunc.indexOf("=>");
+	if (indexFunc !== -1 || indexArrow !== -1) {
+		if ((indexFunc < indexArrow && indexFunc !== -1) || indexArrow === -1) {
+			body = stringFunc.substring(stringFunc.indexOf("{"));
+			var temp = stringFunc.substring(stringFunc.indexOf("(")+1, stringFunc.indexOf(")"));
+			parameters = temp.replace(new RegExp(" ", 'g'), "").split(",");	
+		} else if ((indexArrow < indexFunc && indexArrow !== -1) || indexFunc === -1) {
+			body = stringFunc.substring(indexArrow+2);
+			if (stringFunc.indexOf("{") === stringFunc.indexOf("}")) body = `{${body}}`;
+			var temp = stringFunc.substring(stringFunc.indexOf("(")+1, stringFunc.indexOf(")"));
+			parameters = temp.replace(new RegExp(" ", 'g'), "").split(",");
+		}
 	}
-	firstPart = stringFunc.indexOf(")");
-	var necessaryArray = ((stringFunc.substring(stringFunc.indexOf("(")+1, firstPart).replace(other, "")).split(","));
 	var finalFunction;	
 	if (asynchronous) {
-		finalFunction = new AsyncFunction(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
+		finalFunction = new AsyncFunction(parameters, body);
 	} else {
-		finalFunction = new Function(necessaryArray, stringFunc.substring(firstPart+1, stringFunc.length));
+		finalFunction = new Function(parameters, body);
 	}
-	return finalFunction;
+	return finalFunction;	
 }
 global.require = (mdl)=>{
 	return require(mdl);
