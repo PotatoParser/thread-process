@@ -23,6 +23,7 @@ thr.close();
 	+ [Global Variables Accessible](#global-variables-accessible)
 	+ [Running Functions](#running-functions-asynchronous)
 	+ [Running Multiple Threads](#running-multiple-threads-asynchronous)
+    + [Events](#events)
 	+ [Closing Threads](#closing-threads)
 + [Immediate Thread](#immediate-thread-asynchronous)
 + [Example Usage](#example-usage)
@@ -58,16 +59,6 @@ new thread(function); // Stores a function
 *(Async) returns the function stored*
 ```javascript
 thr.store(function);
-```
-## Function Formats
-Thread-Process currently supports the following function formats
-```javascript
-()=>{}
-function functionName(){}
-```
-The following is an illegal function format
-```javascript
-()=>function();
 ```
 ## Global Variables Accessible
 ```javscript
