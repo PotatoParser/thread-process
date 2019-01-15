@@ -1,4 +1,10 @@
 const thread = require("./threaded");
-var temp = async ()=>console.log("OOF");
-var tp = new thread(temp);
-tp.runOnce();
+var temp = async (text)=>{
+    console.log(`Async! ${text}`);
+}
+async function main(){
+    var tp = new thread();
+    await tp.store(temp);
+    await tp.runOnce(["~ Thread"]);
+}
+main();
