@@ -1,4 +1,5 @@
 ![Thread Process](https://github.com/PotatoParser/threadProcess/blob/master/thread-process.png?raw=true)
+[![Build Status](https://travis-ci.org/PotatoParser/thread-process.png?branch=master)](https://travis-ci.org/PotatoParser/thread-process)
 Simple Threading with JS through NodeJS Cluster
 ```javascript
 const thread = require("thread-process");
