@@ -61,6 +61,7 @@ new thread(function); // Stores a function
 *(Async) returns the function stored*
 ```javascript
 thr.store(function);
+thr.store(function, function.name); // Override the function name or provide one that is missing
 ```
 ## Global Variables Accessible
 ```javscript
