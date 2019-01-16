@@ -45,11 +45,13 @@ module.exports = class Thread extends EventEmitter{
 		return 0;
 	}
 	// Storing functions
-	async store(processFunc){
-		this.open();
-		if (!this.add(processFunc, {name: processFunc.name}, "store")) return false;
-		var temp = new Promise((resolve)=>{
-			this.once("stored", (msg)=>resolve(true));
+	async store(processFunc, processName){
+		if (!this.worker) this.open();
+		if (!this.add(processFunc, {name: processFunc.name || processName || "Anonymous"}, "store")) return false;
+		var temp = await new Promise((resolve)=>{
+			this.once("stored", (msg)=>{
+				resolve(true);
+			});
 		});
 		return processFunc;
 	}
@@ -63,7 +65,6 @@ module.exports = class Thread extends EventEmitter{
 		this.worker.send({type: "run", targetFunction: functionName, args: args});
 		this.active = true;
 		var returnedData = await this.wait();
-		this.emit("complete", returnedData);
 		return returnedData;
 	}	
 	async runOnce(functionName, args){

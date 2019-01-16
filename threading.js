@@ -3,7 +3,7 @@ Object.defineProperty(Object.prototype, "overlap", {
 	enumerable: false,
 	value: function(newObject){
 		for (var key in this){
-			if(newObject[key] != undefined){
+			if(newObject[key] !== undefined){
 				this[key] = newObject[key];
 			}
 		}
@@ -80,13 +80,13 @@ var QUEUE = [];
 // Queue system
 async function execute(){
 	if (QUEUE.length > 0) {
-		if (typeof _threadObj[QUEUE[0].type] == 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);	
+		if (typeof _threadObj[QUEUE[0].type] === 'function') await _threadObj[QUEUE[0].type](QUEUE[0]);	
 		QUEUE.splice(0,1);		
 		execute();	
 	}
 }
 process.on('message', async (data)=>{
-	if (QUEUE.length == 0) {
+	if (QUEUE.length === 0) {
 		QUEUE.push(data);
 		execute();
 	} else QUEUE.push(data);
