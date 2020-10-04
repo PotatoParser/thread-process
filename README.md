@@ -9,7 +9,7 @@ function temp() {
     console.log("Hello World ~Thread");
 }
 
-var thr = new thread();
+const thr = new Thread();
 thr.store(temp);
 thr.run();
 thr.close();
@@ -22,7 +22,7 @@ thr.close();
 + [Thread Class](#thread-class)
 	+ [Constructor](#constructor)
 	+ [Storing functions](#storing-functions-asynchronous)
-	+ [Global Variables Accessible](#global-variables-accessible)
+	+ [Global Variables Accessible](#global-constiables-accessible)
 	+ [Running Functions](#running-functions-asynchronous)
 	+ [Running Multiple Threads](#running-multiple-threads-asynchronous)
     + [Events](#events)
@@ -48,14 +48,14 @@ const thread = require("thread-process");
 ```
 # Properties
 ```javascript
-thread.MAX_THREADS // Gets the maximum CPU count
-thread.OPEN_THREADS // Gets the count of how many threads are active
+Thread.MAX_THREADS // Gets the maximum CPU count
+Thread.OPEN_THREADS // Gets the count of how many threads are active
 ```
 # Thread Class
 ## Constructor
 ```javascript
-new thread(); // Constructing a thread with default settings
-new thread(function); // Stores a function
+new Thread(); // Constructing a thread with default settings
+new Thread(function); // Stores a function
 ```
 ## Storing Functions *(Asynchronous)*
 *(Async) returns the function stored*
@@ -90,7 +90,7 @@ thr.run([arg1,arg2,arg3])
 
 *(Async) returns data as an Array*
 ```javascript
-thread.runAll(thr.run(), ...);
+Thread.runAll(thr.run(), ...);
 ```
 ## Events
 Event handling can make life much easier!
@@ -107,18 +107,18 @@ Runs a function within a thread and immediately closes the thread upon completio
 
 *(Async) returns the data returned by the function executed*
 ```javascript
-thread.exec(function);
-thread.exec(function, [arg1,arg2,arg3]);
+Thread.exec(function);
+Thread.exec(function, [arg1,arg2,arg3]);
 ```
 # Example Usage
-Using thread variables
+Using thread constiables
 ```javascript
-var temp = (text)=>{
+const temp = (text)=>{
     console.log(THREAD_DATA);
     console.log(FOCUSED_FUNCTION); // Outputs "temp"
 }
 async function main(){
-    var tp = new thread();
+    const tp = new Thread();
     await tp.store(temp);
     await tp.runOnce();
 }
@@ -126,11 +126,11 @@ main();
 ```
 Asynchronous management of threads & passing values
 ```javascript
-var temp = async (text)=>{
+const temp = async (text)=>{
     console.log(`Async! ${text}`);
 }
 async function main(){
-    var tp = new thread();
+    const tp = new Thread();
     await tp.store(temp);
     await tp.runOnce(["~ Thread"]);
 }
@@ -138,10 +138,10 @@ main();
 ```
 Multiple stored functions
 ```javascript
-var func1 = ()=>{console.log("First function!")}
-var func2 = ()=>{console.log("Second function!")}
+const func1 = ()=>{console.log("First function!")}
+const func2 = ()=>{console.log("Second function!")}
 async function main(){
-    var tp = new thread();
+    const tp = new Thread();
     await tp.store(func1);
     await tp.store(func2);
     await tp.runOnce("func1");
@@ -150,21 +150,21 @@ main();
 ```
 Using **then** instead of async/await
 ```javascript
-var temp = ()=>{console.log("Hello World!")}
-var tp = new thread();
+const temp = ()=>{console.log("Hello World!")}
+const tp = new Thread();
 tp.store(temp).then((result)=>{tp.runOnce();});
 ```
 Running simultaneous threads
 ```javascript
-var temp = ()=>{return "Hello";}
-var tp = new thread(temp);
-var tp2 = new thread(temp);
-thread.runAll(tp.runOnce(), tp.runOnce()).then((result)=>console.log(result));
+const temp = ()=>{return "Hello";}
+const tp = new Thread(temp);
+const tp2 = new Thread(temp);
+Thread.runAll(tp.runOnce(), tp.runOnce()).then((result)=>console.log(result));
 ```
 Running with events
 ```javascript
-var temp = ()=>{RETURN("Hello")};
-var tp = new thread(temp);
+const temp = ()=>{RETURN("Hello")};
+const tp = new Thread(temp);
 tp.on("returned", (data)=>{
     console.log(data);
     tp.close();
